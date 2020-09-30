@@ -22,12 +22,14 @@
     <!-- You can now combine a row and column if you just need a 12 column row -->
     <center>
       <form action="/register" method="post">
+        <p>Name</p>
+        <div style="width: 30%;">{{ form.name }}</div>
         <p>Email</p>
         <div style="width: 30%;">{{ form.email }}</div>
         <p>Password</p>
         <div style="width: 30%">{{ form.password }}</div>
         <p>Confirm Password</p>
-        <div style="width: 30%"><input type="text" id="confirm"></div>
+        <div style="width: 30%"><input type="password" id="confirm"></div>
 
         {{ form.hidden_tag() }}
         <br>
