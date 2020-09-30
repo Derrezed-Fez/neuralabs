@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Neuralabs | Welcome</title>
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+    <link rel="stylesheet" href="../static/main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   </head>
   <body>
@@ -17,8 +18,13 @@
             <br>
             <img class="thumbnail" src="https://placehold.it/550x350">
             <h5>{{ name }}</h5>
-            <a href="/logout">Logout</a>
-            <p>Duis aliquet egestas purus in blandit. Curabitur vulputate, ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed molestie augue sit amet leo.</p>
+            <ul>
+              <li><a href="">Dashboard</a></li>
+              <li><a href="">Create New Lab</a></li>
+              <li><a href="">Edit Lab</a></li>
+              <li><a href="">Profile</a></li>
+              <li><a href="/logout">Logout</a></li>
+            </ul>
           </div>
         </div>
 
@@ -29,7 +35,7 @@
               <span class="title-bar-title">Mike Mikerson</span>
             </div>
           </div>
-          <div class="callout primary">
+          <div class="callout secondary">
             <div class="row column">
               <h1>Welcome back to Neuralabs!</h1>
               <p class="lead">Here's how you rank, {{name}}.</p>
