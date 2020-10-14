@@ -48,4 +48,4 @@ Unless the changes you are making are hotfixes, please follow the following proc
 1. Create a branch. Please name it appropriately and keep it under 25 characters.
 2. Check out your branch and make your changes.
 3. After you are sure that everything is working properly, create a pull request to merge your branch back into our development branch.
-4. Tag Zane on the PR and notify him to check the changes. NOTE: DO NOT MERGE PULL REQUESTS IN WITHOUT CHECKING WITH ZANE.
+4. Tag Zane on the PR and notify him to check the changes. NOTE: NEVER make a pull request directly to master. Always request changes to be merged into the development branch first.
