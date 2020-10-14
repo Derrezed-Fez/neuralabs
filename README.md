@@ -34,7 +34,9 @@
 
  First activate the environment see above.
  Then launch flask.
-
+```bash
+export FLASK_APP=__init__.py
+```
  ```bash
  flask run
  ```
