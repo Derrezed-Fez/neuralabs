@@ -1,33 +1,6 @@
-<!doctype html>
-<html class="no-js" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neuralabs | Welcome</title>
-    <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
-    <link rel="stylesheet" href="../static/main.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-  </head>
-  <body>
+{% extends 'header.html' %}
 
-    <div class="off-canvas-wrapper">
-      <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
-
-        <div class="off-canvas position-left reveal-for-large" id="my-info" data-off-canvas data-position="left">
-          <div class="row column">
-            <br>
-            <img class="thumbnail" src="https://placehold.it/550x350">
-            <h5>{{ name }}</h5>
-            <ul>
-              <li><a href="">Dashboard</a></li>
-              <li><a href="">Create New Lab</a></li>
-              <li><a href="">Edit Lab</a></li>
-              <li><a href="">Profile</a></li>
-              <li><a href="/logout">Logout</a></li>
-            </ul>
-          </div>
-        </div>
-
+{% block content %}
         <div class="off-canvas-content" data-off-canvas-content>
           <div class="title-bar hide-for-large">
             <div class="title-bar-left">
@@ -96,70 +69,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
-    <script>
-      $(document).foundation();
-      var randomScalingFactor = function() {
-			return Math.round(Math.random() * 100);
-		};
-
-		var color = Chart.helpers.color;
-		var config = {
-			type: 'radar',
-			data: {
-				labels: [['Digital Forensics', 'Network Forensics'], ['Ethical Hacking', 'Server Hardening'], 'Automotive Security', ['Incident Response', 'Social Engineering'], 'Malware', 'Reverse Engineering', 'CodeOps'],
-				datasets: [{
-					label: 'My First dataset',
-					backgroundColor: 'red',
-					borderColor: 'red',
-					pointBackgroundColor: 'red',
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					]
-				}, {
-					label: 'My Second dataset',
-					backgroundColor: 'blue',
-					borderColor: 'blue',
-					pointBackgroundColor: 'blue',
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					]
-				}]
-			},
-			options: {
-				legend: {
-					position: 'top',
-				},
-				title: {
-					display: true,
-					text: 'Lab Distribution'
-				},
-				scale: {
-					beginAtZero: true
-				},
-        responsive: false
-			}
-		};
-
-		window.onload = function() {
-			window.myRadar = new Chart(document.getElementById('stats'), config);
-		};
-    </script>
-  </body>
-</html>
+    <script src="../static/dashboard.js"></script>
+  {% endblock %}

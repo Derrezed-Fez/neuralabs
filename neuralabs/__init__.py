@@ -68,6 +68,15 @@ def login():
 def dashboard():
     return render_template('dashboard.html', name=current_user.name)
 
+@app.route('/create')
+@login_required
+def create_lab():
+    return render_template('instructor/create.html', name=current_user.name)
+
+@app.route('/manage')
+def manage_labs():
+    return render_template('instructor/manage.html', name=current_user.name)
+
 @app.route('/logout', methods = ['GET'])
 @login_required
 def logout():
