@@ -1,0 +1,52 @@
+{% extends 'navbar.html' %}
+
+{% block content %}
+    <br>
+    <div style="width: 80%; margin: auto;">
+        <div class="row">
+            <img class="columns small-2" src="https://via.placeholder.com/150">
+            <div class="columns small-4">
+                <h1 class="row">{{ user.name }}</h1>
+                <p class="row button tiny hollow success">Student</p>
+            </div>
+            <a class="columns small-2 button small"><i class="fi-pencil"></i> Edit Profile</a>
+        </div>
+        <br>
+        <ul class="tabs" data-tabs id="example-tabs">
+          <li class="tabs-title is-active"><a data-tabs-target="about" href="#about" aria-selected="true">About</a></li>
+          <li class="tabs-title"><a data-tabs-target="about" href="#friends">Friends</a></li>
+            <li class="tabs-title"><a data-tabs-target="about" href="#settings">Settings</a></li>
+        </ul>
+        <br>
+        <div class="row gutter-small tabs-panel is-active" id="about">
+            <table class="columns large-5">
+                <thead>
+                    <tr>
+                      <th width="200">Account Information</th>
+                    </tr>
+                    <tbody>
+                        <tr><td><label style="color: gray"><i class="fi-projection-screen"></i> School: </label> Eastern Michigan University</td></tr>
+                        <tr><td><label style="color: gray"><i class="fi-mail"></i> Email: </label> {{ user.email }}</td></tr>
+                        <tr><td><label style="color: gray"><i class="fi-calendar"></i> Joined on: </label>{{ user.join_date }}</td></tr>
+                    </tbody>
+                </thead>
+            </table>
+            <table class="columns large-6 unstriped">
+                <thead>
+                    <tr>
+                        <th>
+                            Enrolled Courses
+                            <a href="join" style="float: right;"><i class="fi-plus"></i> Join Class</a>
+                        </th>
+                    </tr>
+                    <tbody>
+                        <tr><td>IA 428 - Digital Forensics II</td></tr>
+                        <tr><td>IA 462 - Adv Oper Sys Sec & Admin</td></tr>
+                        <tr><td>IA 473 - Network Forensics & Analytics</td></tr>
+                        <tr><td>ISAC 479 - Intro Cloud Computing Sec</td></tr>
+                    </tbody>
+                </thead>
+            </table>
+        </div>
+    </div>
+{% endblock %}

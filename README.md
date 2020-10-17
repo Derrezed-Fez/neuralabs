@@ -27,7 +27,7 @@
  3. Install the dependencies:
 
  ```bash
- pip3 install -r dependencies.txt
+ pip3 install -r requirements.txt
  ```
 
  ## Running the Flask Application

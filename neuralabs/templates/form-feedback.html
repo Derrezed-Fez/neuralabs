@@ -1,0 +1,18 @@
+{% if form.is_submitted() and not form.errors.items() %}
+    <div data-closable class="callout alert-callout-border success radius">
+          <strong>Success</strong>.
+          <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+{% endif %}
+{% for field, errors in form.errors.items() %}
+    {% for error in errors %}
+        <div data-closable class="callout alert-callout-border alert radius">
+          <strong>Error</strong> - {{ error }}.
+          <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+    {% endfor %}
+{% endfor %}

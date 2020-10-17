@@ -1,32 +1,23 @@
-{% extends 'header.html' %}
+{% extends 'navbar.html' %}
 
 {% block content %}
-        <div class="off-canvas-content" data-off-canvas-content>
-          <div class="title-bar hide-for-large">
-            <div class="title-bar-left">
-              <button class="menu-icon" type="button" data-open="my-info"></button>
-              <span class="title-bar-title">Mike Mikerson</span>
-            </div>
-          </div>
           <div class="callout secondary">
             <div class="row column">
               <h1>Welcome back to Neuralabs!</h1>
-              <p class="lead">Here's how you rank, {{name}}.</p>
+              <p class="lead">Here's how you rank, {{ user.name}}.</p>
             </div>
           </div>
           <div class="row">
             <canvas id="stats" style="width: 500px; height: 500px"></canvas>
           </div>
-          <hr />
+          <hr/>
           <div class="row small-up-2 medium-up-3 large-up-4">
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
+            {% for course in courses %}
+                <div class="column">
+                  <img class="thumbnail" src="https://placehold.it/550x550">
+                  <h5>Test Lab</h5>
+                </div>
+            {% endfor %}
             <div class="column">
               <img class="thumbnail" src="https://placehold.it/550x550">
               <h5>Test Lab</h5>
@@ -69,8 +60,5 @@
             </div>
           </div>
         </div>
-
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
     <script src="../static/dashboard.js"></script>
   {% endblock %}
