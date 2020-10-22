@@ -1,0 +1,37 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+      {% include 'head.html' %}
+      <title>Neuralabs | Login</title>
+  </head>
+  <body>
+
+
+    <!-- Start Top Bar -->
+    <div class="top-bar">
+      <div class="row">
+        <center>
+          <h3>Login to Neuralabs</h3>
+        </center>
+      </div>
+    </div>
+    <!-- End Top Bar -->
+    <br>
+    <!-- You can now combine a row and column if you just need a 12 column row -->
+    <center>
+      <form action="" method="post">
+            {% include 'form-feedback.html' %}
+            <p>Email</p>
+            <div style="width: 30%;">{{ form.email }}</div>
+            <p>Password</p>
+            <div style="width: 30%;">{{ form.password }}</div>
+            {{ form.hidden_tag() }}
+            <br>
+            <br>
+            <input class="button" type="submit" value="Login">
+        </form>
+        <a href="change-password">Forgot Password</a><br>
+        <a href="register">I need to register for an account</a>
+    </center>
+  </body>
+</html>

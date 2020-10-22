@@ -1,5 +1,4 @@
-$(document).foundation();
-  var randomScalingFactor = function() {
+var randomScalingFactor = function() {
   return Math.round(Math.random() * 100);
 };
 
