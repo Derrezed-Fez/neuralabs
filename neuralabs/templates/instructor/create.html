@@ -1,3 +1,24 @@
 {% extends 'navbar.html' %}
 {% block content %}
+<div class='row'>
+  <h2>Create a New Lab</h2>
+</div>
+<div class='row'>
+  <form>
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x">
+      <div class="medium-6 cell">
+        <label>Lab Name
+          <input type="text" placeholder="Memory Forensics">
+        </label>
+      </div>
+      <div class="medium-6 cell">
+        <label>Lab Tags (add up to 10 comma separated values)
+          <input type="text" placeholder="Linux, Scripting, Permissions">
+        </label>
+      </div>
+    </div>
+  </div>
+  </form>
+</div>
 {% endblock %}

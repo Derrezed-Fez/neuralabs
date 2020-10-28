@@ -14,7 +14,7 @@
           <div class="row column">
             <br>
             <img class="thumbnail" src="https://placehold.it/550x350">
-            <h5>{{ name }}</h5>
+            <h5>{{ user.name }} | {{user.email}}</h5>
             <div class="sidenav">
               <button onclick="location.href = '/dashboard'"><i class="fi-layout"></i> Dashboard</button>
                 <button onclick="location.href = '/manage'"><i class="fi-wrench"></i> Manage Labs</button>
@@ -31,7 +31,9 @@
               <span class="title-bar-title">Neuralabs</span>
             </div>
           </div>
+        <div style="padding: 5px;">
           {% block content %}{% endblock %}
+        </div>
         </div>
       </div>
       </div>
