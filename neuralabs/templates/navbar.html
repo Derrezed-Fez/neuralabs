@@ -8,26 +8,19 @@
   <body onload="$(document).foundation();">
 
     <div class="off-canvas-wrapper">
-      <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
-
-        <div class="off-canvas position-left reveal-for-large" id="my-info" data-off-canvas data-position="left">
-          <div class="row column">
-            <br>
-            <img class="thumbnail" src="https://placehold.it/550x350">
-            <h5>{{ user.name }} | {{user.email}}</h5>
-            <div class="sidenav">
-              <button onclick="location.href = '/dashboard'"><i class="fi-layout"></i> Dashboard</button>
-                <button onclick="location.href = '/manage'"><i class="fi-wrench"></i> Manage Labs</button>
-              <button onclick="location.href = '/profile'"><i class="fi-torso"></i> Profile</button>
-              <button onclick="location.href = '/logout'"><i class="fi-arrow-left"></i> Logout</button>
-            </div>
-          </div>
-        </div>
+      <div class="sidenav" style="width: 20%; height: 100%">
+        <img class="thumbnail" src="https://placehold.it/550x350">
+        <h5>{{ name }}</h5>
+        <button onclick="location.href = '/dashboard'"><i class="fi-layout"></i> Dashboard</button>
+        <button onclick="location.href = '/manage'"><i class="fi-wrench"></i> Manage Labs</button>
+        <button onclick="location.href = '/profile'"><i class="fi-torso"></i> Profile</button>
+        <button onclick="location.href = '/logout'"><i class="fi-arrow-left"></i> Logout</button>
+      </div>
+      <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper style="width:80%; float: right;">
 
         <div class="off-canvas-content" data-off-canvas-content>
           <div class="title-bar hide-for-large">
             <div class="title-bar-left">
-              <button class="menu-icon" type="button" data-open="my-info"></button>
               <span class="title-bar-title">Neuralabs</span>
             </div>
           </div>
