@@ -22,3 +22,5 @@ class Lab(UserMixin, db.Document):
     date_created = db.DateTimeField()
     difficulty = db.StringField()
     description = db.StringField()
+    pages = db.ListField(default=[])
+    pk_owner = db.ObjectIdField()
