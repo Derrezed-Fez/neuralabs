@@ -20,3 +20,5 @@ class Lab(UserMixin, db.Document):
     name = db.StringField(max_length=30)
     tags = db.ListField(defualt=[])
     date_created = db.DateTimeField()
+    difficulty = db.StringField()
+    description = db.StringField()

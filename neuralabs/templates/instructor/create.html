@@ -1,24 +1,61 @@
 {% extends 'navbar.html' %}
 {% block content %}
-<div class='row'>
-  <h2>Create a New Lab</h2>
+<div class='row' style="background:#D3D3D3;">
+  <center>
+    <h2>Create a New Lab</h2>
+  </center>
 </div>
 <div class='row'>
-  <form>
-  <div class="grid-container">
-    <div class="grid-x grid-padding-x">
-      <div class="medium-6 cell">
-        <label>Lab Name
-          <input type="text" placeholder="Memory Forensics">
-        </label>
+  <center>
+    <form>
+      <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+          <h3><small><strong>Basic Lab Info</strong></small></h3>
+          <div class="medium-6 cell">
+            <label>Lab Name
+              <input type="text" placeholder="Memory Forensics">
+            </label>
+          </div>
+          <div class="medium-6 cell">
+            <label>Lab Tags (add up to 10 comma separated values)
+              <input type="text" placeholder="Linux, Scripting, Permissions">
+            </label>
+          </div>
+          <div class="medium-6 cell">
+            <label>Lab Difficulty
+              <select>
+                <option>Easy</option>
+                <option>Medium</option>
+                <option>Hard</option>
+                <option>Impossible</option>
+              </select>
+            </label>
+        </div>
+        <div class="medium-6 cell">
+          <label>Description
+            <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..."></textarea>
+          </label>
+        </div>
+        <h3><small><strong>Sequential Pages</strong></small></h3>
+        <div id="sequential_pages">
+          <div class="medium-6 cell">
+            <label>Page Title
+              <input type="text" placeholder="Pre-Lab Setup">
+            </label>
+          </div>
+          <div class="medium-6 cell">
+            <label>Assignment Details
+              <textarea style="height:100px;" placeholder="Step 1: boot up your VM..."></textarea>
+            </label>
+          </div>
+          <div class="medium-6 cell">
+            <label for="fileUpload1" class="button">Upload External Media</label>
+            <input type="file" id="fileUpload1" class="show-for-sr">
+          </div>
+          <input class="button" onclick="addLabPage();" value="Add Another Page"/>
+        </div>
       </div>
-      <div class="medium-6 cell">
-        <label>Lab Tags (add up to 10 comma separated values)
-          <input type="text" placeholder="Linux, Scripting, Permissions">
-        </label>
-      </div>
-    </div>
-  </div>
-  </form>
+    </form>
+  </center>
 </div>
 {% endblock %}
