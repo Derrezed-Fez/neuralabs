@@ -17,6 +17,11 @@
             </label>
           </div>
           <div class="medium-6 cell">
+            <label for="lab-photo" class="button">Upload Lab Photo</label>
+            <img id="image-preview" src="#" alt="your image" />
+            <input type="file" id="lab-photo" class="show-for-sr" name="lab-photo">
+          </div>
+          <div class="medium-6 cell">
             <label>Lab Tags (add up to 10 comma separated values)
               <input type="text" placeholder="Linux, Scripting, Permissions">
             </label>
@@ -61,6 +66,7 @@
           <input type="hidden" class="total-page-count"/>
         </div>
         <input class="button" onclick="addLabPage();" value="Add Another Page"/>
+        <input class="button" style="background-color:green;" type="submit" value="Create Lab"/>
       </div>
     </form>
   </center>

@@ -28,3 +28,19 @@ $('#score_engine_enable_1').change(function() {
     $('#score_engine_value_1').prop('disabled',true);
   }
 });
+
+function readURL(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      $('#image-preview').attr('src', e.target.result);
+    }
+
+    reader.readAsDataURL(input.files[0]); // convert to base64 string
+  }
+}
+
+$("#lab-photo").change(function() {
+  readURL(this);
+});
