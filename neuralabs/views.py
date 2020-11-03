@@ -1,10 +1,13 @@
-from neuralabs.forms import ResetPasswordForm, RegForm, LoginForm, ChangePasswordForm
+from neuralabs.forms import *
 from neuralabs.models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import Flask, render_template, request, redirect, url_for
 from neuralabs.__init__ import app
 import datetime
+import string
+import random
+from flask import abort, jsonify
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -65,10 +68,22 @@ def dashboard():
     return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    return render_template('accounts/profile.html', page='Profile', user=current_user)
+    form = JoinForm()
+    if request.method == 'POST':
+        join_code = request.form.get('join_code')
+        if join_code:
+            course = Course.objects(join_code=join_code).first()
+            if course:
+                course.update(push__students=str(current_user.id))
+            else:
+                form.errors['invalid'] = ['Join code does not exist.']
+    enrolled_courses = Course.objects(students__contains=str(current_user.id))
+    instructor_courses = Course.objects(instructors__contains=str(current_user.id))
+    return render_template('accounts/profile.html', page='Profile', user=current_user, form=form,
+                           enrolled_courses=enrolled_courses, instructor_courses=instructor_courses)
 
 
 @app.route('/create')
@@ -78,8 +93,59 @@ def create_lab():
 
 
 @app.route('/manage')
+@login_required
 def manage_labs():
     return render_template('instructor/manage.html', page='Manage Labs', user=current_user)
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin():
+    if not current_user.is_admin:
+        abort(403, description='User does not have permission to access.')
+    form = CourseForm()
+    if request.method == 'POST':
+        if form.validate_on_submit() and current_user.is_admin:
+            new_course = Course(title=form.title.data)
+            new_course.join_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            new_course.save()
+            return redirect(url_for('admin'))
+    courses = Course.objects.all()
+    return render_template('administration/admin.html', page='Admin', user=current_user, form=form, courses=courses)
+
+
+@app.route('/course/<course_id>')
+@login_required
+def manage_course(course_id):
+    course = Course.objects(id=course_id).first()
+    if not course:
+        abort(404, description='Course not found.')
+
+    students = User.objects(id__in=course.students)
+    instructors = User.objects(id__in=course.instructors)
+    has_perms = current_user.is_admin or current_user in instructors
+    if has_perms and request.values.get('remove'):
+        course.update(pull__students=request.values.get('remove'))
+        return redirect(url_for('manage_course', course_id=course_id))
+    if has_perms and request.values.get('add_instructor'):
+        course.update(pull__students=request.values.get('add_instructor'))
+        course.update(push__instructors=request.values.get('add_instructor'))
+        return redirect(url_for('manage_course', course_id=course_id))
+    if has_perms and request.values.get('remove_instructor'):
+        course.update(pull__instructors=request.values.get('remove_instructor'))
+        return redirect(url_for('manage_course', course_id=course_id))
+    return render_template('administration/course.html', page='Course', user=current_user, course=course,
+                           students=students, instructors=instructors, has_perms=has_perms)
+
+
+@app.route('/instructors')
+@login_required
+def instructors():
+    if current_user.is_admin:
+        query = request.values.get('q')
+        if query:
+            instructors = User.objects(role__in=['I', 'A'], name__icontains=query).values_list('id', 'name', 'email')
+            return jsonify(instructors)
 
 
 @app.route('/logout', methods=['GET'])
