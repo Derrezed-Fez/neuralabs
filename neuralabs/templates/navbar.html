@@ -6,30 +6,43 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   </head>
   <body onload="$(document).foundation();">
-
-    <div class="off-canvas-wrapper">
-      <div class="sidenav" style="width: 20%; height: 100%">
-        <img class="thumbnail" src="https://placehold.it/550x350">
-        <h5>{{ name }}</h5>
-        <button onclick="location.href = '/dashboard'"><i class="fi-layout"></i> Dashboard</button>
-        <button onclick="location.href = '/manage'"><i class="fi-wrench"></i> Manage Labs</button>
-        <button onclick="location.href = '/profile'"><i class="fi-torso"></i> Profile</button>
-        <button onclick="location.href = '/logout'"><i class="fi-arrow-left"></i> Logout</button>
-      </div>
-      <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper style="width:80%; float: right;">
-
-        <div class="off-canvas-content" data-off-canvas-content>
-          <div class="title-bar hide-for-large">
-            <div class="title-bar-left">
-              <span class="title-bar-title">Neuralabs</span>
+  <div class="off-canvas-wrapper">
+  <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+    <div class="off-canvas position-left reveal-for-large" id="offCanvasLeft" data-off-canvas data-transition="push">
+        <div id="sidenav">
+        <a href="/" style="color: black">
+            <img style="height: 100px;" src="https://logoipsum.com/logo/logo-16.svg">
+            <h5>Neuralabs</h5>
+        </a>
+            <div id="sidenav-buttons">
+                <a href="/dashboard"><i class="fi-layout"></i> Dashboard</a>
+                <hr>
+                {% if user.is_student %}
+                    <a href="/grades"><i class="fi-book"></i> Grade Book</a>
+                {% elif user.is_instructor %}
+                    <a href="/manage"><i class="fi-wrench"></i> Manage Labs</a>
+                {% elif user.is_admin %}
+                    <a href="/admin"><i class="fi-wrench"></i> Admin</a>
+                {% endif %}
+                <hr>
+                <a href="/profile"><i class="fi-torso"></i> Profile</a>
+                <hr>
+                <a href="/logout"><i class="fi-arrow-left"></i> Logout</a>
+                <hr>
             </div>
+        </div>
+    </div>
+    <div class="off-canvas-content" data-off-canvas-content>
+        <div class="title-bar hide-for-large">
+            <div class="title-bar-left">
+              <button class="menu-icon" type="button" data-open="offCanvasLeft"></button>
+              <span class="title-bar-title">Neuralabs</span>
           </div>
-        <div style="padding: 5px;">
-          {% block content %}{% endblock %}
-        </div>
-        </div>
       </div>
-      </div>
+        {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
   </body>
 <script>
     $(document).foundation();
