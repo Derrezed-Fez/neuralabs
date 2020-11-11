@@ -18,6 +18,7 @@ class User(UserMixin, db.Document):
 class Lab(UserMixin, db.Document):
     meta = {'collection': 'Lab'}
     name = db.StringField(max_length=30)
+    image = db.BinaryField()
     tags = db.ListField(defualt=[])
     date_created = db.DateTimeField()
     difficulty = db.StringField()

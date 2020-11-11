@@ -7,13 +7,13 @@
 </div>
 <div class='row'>
   <center>
-    <form>
+    <form action="/manage" method="POST">
       <div class="grid-container">
         <div class="grid-x grid-padding-x">
           <h3><small><strong>Basic Lab Info</strong></small></h3>
           <div class="medium-6 cell">
             <label>Lab Name
-              <input type="text" placeholder="Memory Forensics">
+              {{form.name}}
             </label>
           </div>
           <div class="medium-6 cell">
@@ -23,7 +23,7 @@
           </div>
           <div class="medium-6 cell">
             <label>Lab Tags (add up to 10 comma separated values)
-              <input type="text" placeholder="Linux, Scripting, Permissions">
+              {{form.tags}}
             </label>
           </div>
           <div class="medium-6 cell">
@@ -63,7 +63,7 @@
             <label for="fileUpload1-p1" class="button">Upload External Media</label>
             <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1">
           </div>
-          <input type="hidden" class="total-page-count"/>
+          <input type="hidden" class="total-page-count" name='total-page-count'/>
         </div>
         <input class="button" onclick="addLabPage();" value="Add Another Page"/>
         <input class="button" style="background-color:green;" type="submit" value="Create Lab"/>
