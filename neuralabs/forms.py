@@ -34,3 +34,12 @@ class ResetPasswordForm(FlaskForm):
 
 class LabForm(FlaskForm):
     title = StringField('title')
+
+
+class CourseForm(FlaskForm):
+    title = StringField('title', validators=[InputRequired()])
+
+
+class JoinForm(FlaskForm):
+    join_code = StringField('join_code', validators=[InputRequired(), Length(max=6)],
+                            render_kw={"placeholder": "xxxxxx", 'maxlength': '6', 'minlength': '6'})

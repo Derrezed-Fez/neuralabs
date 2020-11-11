@@ -3,11 +3,20 @@
 {% block content %}
     <br>
     <div style="width: 80%; margin: auto;">
+        <form method="post" class="reveal" id="join-course" data-reveal>
+          <p class="lead">Enter course code to join:</p>
+            {{ form.join_code(required='required') }}
+            <!--<input type="text" name="join_code" placeholder="xxxxxx" minlength="6" maxlength="6" required> -->
+            <button class="button small" type="submit">Join</button>
+          <button class="close-button" data-close aria-label="Close modal" type="button">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </form>
         <div class="row">
             <img class="columns small-2" src="https://via.placeholder.com/150">
             <div class="columns small-4">
                 <h1 class="row">{{ user.name }}</h1>
-                <p class="row button tiny hollow success">Student</p>
+                <p class="row button tiny hollow" style="color: {{ user.role_color }}; border-color: {{ user.role_color }}">{{ user.role_display }}</p>
             </div>
             <a class="columns small-2 button small"><i class="fi-pencil"></i> Edit Profile</a>
         </div>
@@ -19,6 +28,7 @@
         </ul>
         <br>
         <div class="row gutter-small tabs-panel is-active" id="about">
+        {% include 'form-feedback.html' %}
             <table class="columns large-5">
                 <thead>
                     <tr>
@@ -36,14 +46,16 @@
                     <tr>
                         <th>
                             Enrolled Courses
-                            <a href="join" style="float: right;"><i class="fi-plus"></i> Join Class</a>
+                            <a data-open="join-course" style="float: right;"><i class="fi-plus"></i> Join Course</a>
                         </th>
                     </tr>
                     <tbody>
-                        <tr><td>IA 428 - Digital Forensics II</td></tr>
-                        <tr><td>IA 462 - Adv Oper Sys Sec & Admin</td></tr>
-                        <tr><td>IA 473 - Network Forensics & Analytics</td></tr>
-                        <tr><td>ISAC 479 - Intro Cloud Computing Sec</td></tr>
+                        {% for course in enrolled_courses %}
+                            <tr><td>{{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
+                        {% endfor %}
+                        {% for course in instructor_courses %}
+                            <tr><td>[Instructor] {{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
+                        {% endfor %}
                     </tbody>
                 </thead>
             </table>

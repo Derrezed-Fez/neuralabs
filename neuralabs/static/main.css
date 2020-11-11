@@ -1,20 +1,39 @@
-.sidenav {
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  overflow-x: hidden;
-  transition: 0.5s;
+*,*:focus,*:hover{
+    outline:none;
 }
 
-.sidenav button {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-  transition: 0.3s;
+#sidenav-buttons {
+    margin: 50px auto;
+    width: 70%;
 }
 
-.sidenav button:hover {
-  color: #f1f1f1;
+.off-canvas {
+    background: white;
+    text-align: center;
+}
+
+.callout.secondary {
+    border: 0;
+    background-color: lightseagreen;  /* TODO: Pick a color scheme */
+    color: #ffffff;
+}
+
+.position-left.is-transition-push {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-right: 1px #f1f1f1 solid;
+}
+
+#instructor-results {
+    border: 1px solid #cacaca;
+    text-indent: 10px;
+}
+
+.instructor-result {
+    background: white;
+    padding: 5px;
+}
+.instructor-result:hover {
+    background: lightseagreen;
+    cursor: pointer;
 }
