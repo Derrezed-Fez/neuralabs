@@ -15,6 +15,9 @@
   </div>
   <hr />
   <div class="row small-up-2 medium-up-3 large-up-4">
+    {% if not labs %}
+    <h5>You have not yet created any Labs</h5>
+    {% endif %}
     {% for lab in labs %}
       <div class="column">
         <img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}">
