@@ -12,7 +12,6 @@ import string
 import random
 from flask import abort, jsonify
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegForm()
@@ -101,23 +100,26 @@ def manage_labs():
     form = LabForm()
     if request.method == 'POST':
         if current_user.is_authenticated:
-            name = request.form['name']
-            image = request.form['lab-photo']
-            with open(image, "rb") as f:
-                encoded_image = Binary(f.read())
+            image = request.files['lab-photo']
+            encoded_image = base64.b64encode(image.read())
             tags = []
-            for tag in request.form['tags'].split(',').trim():
-                tags.append(tag)
-            total_page_count = request.form['total-page-count']
+            for tag in request.form['tags'].split(','):
+                tags.append(tag.strip())
+            total_page_count = int(request.form['total-page-count'])
             pages = []
             for i in range(1, total_page_count+1):
                 file_name = request.form['fileUpload-1' + str(i)]
-
                 page = {
                     'title': request.form['title-p' + str(i)],
                     'details': request.form['details-p' + str(i)],
                 }
-    return render_template('instructor/manage.html', page='Manage Labs', user=current_user)
+                pages.append(page)
+            lab = Lab(request.form['name'], encoded_image, tags, datetime.datetime.now, request.form['difficulty'],
+                    request.form['description'], pages, current_user.id)
+            lab.save()
+    labs = Lab.objects(pk_owner__contains=str(current_user.id))
+    print(labs)
+    return render_template('instructor/manage.html', page='Manage Labs', user=current_user, labs=labs)
 
 
 @app.route('/admin', methods=['GET', 'POST'])

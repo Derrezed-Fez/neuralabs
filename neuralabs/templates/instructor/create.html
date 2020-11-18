@@ -1,13 +1,14 @@
 {% extends 'navbar.html' %}
 {% block content %}
-<div class='row' style="background:#D3D3D3;">
-  <center>
-    <h2>Create a New Lab</h2>
-  </center>
+<div class="callout secondary">
+  <div class="row column">
+    <h1>Create New Lab</h1>
+  </div>
 </div>
+<hr />
 <div class='row'>
   <center>
-    <form action="/manage" method="POST">
+    <form action="/manage" method="POST" enctype=multipart/form-data>
       <div class="grid-container">
         <div class="grid-x grid-padding-x">
           <h3><small><strong>Basic Lab Info</strong></small></h3>
@@ -28,17 +29,17 @@
           </div>
           <div class="medium-6 cell">
             <label>Lab Difficulty
-              <select>
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
-                <option>Impossible</option>
+              <select name="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="impossible">Impossible</option>
               </select>
             </label>
         </div>
         <div class="medium-6 cell">
           <label>Description
-            <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..."></textarea>
+            <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..." name="description"></textarea>
           </label>
         </div>
         <h3><small><strong>Sequential Pages</strong></small></h3>
@@ -60,11 +61,15 @@
             </label>
           </div>
           <div class="medium-6 cell">
+            <div id="files-p1">
+
+            </div>
             <label for="fileUpload1-p1" class="button">Upload External Media</label>
-            <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1">
+            <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
           </div>
-          <input type="hidden" class="total-page-count" name='total-page-count'/>
+          <input type="hidden" class="total-page-count"/>
         </div>
+        <input id='total-page-count' type="hidden" name='total-page-count' value='0'/>
         <input class="button" onclick="addLabPage();" value="Add Another Page"/>
         <input class="button" style="background-color:green;" type="submit" value="Create Lab"/>
       </div>
