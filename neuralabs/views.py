@@ -5,10 +5,12 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask import Flask, render_template, request, redirect, url_for
 from neuralabs.__init__ import app
 import datetime
+import base64
+import bson
+from bson.binary import Binary
 import string
 import random
 from flask import abort, jsonify
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -89,13 +91,35 @@ def profile():
 @app.route('/create')
 @login_required
 def create_lab():
-    return render_template('instructor/create.html', page='Create Lab', user=current_user)
+    form = LabForm()
+    return render_template('instructor/create.html', page='Create Lab', user=current_user, form=form)
 
 
-@app.route('/manage')
-@login_required
+@app.route('/manage', methods=['GET', 'POST'])
 def manage_labs():
-    return render_template('instructor/manage.html', page='Manage Labs', user=current_user)
+    form = LabForm()
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            image = request.files['lab-photo']
+            encoded_image = base64.b64encode(image.read())
+            tags = []
+            for tag in request.form['tags'].split(','):
+                tags.append(tag.strip())
+            total_page_count = int(request.form['total-page-count'])
+            pages = []
+            for i in range(1, total_page_count+1):
+                file_name = request.form['fileUpload-1' + str(i)]
+                page = {
+                    'title': request.form['title-p' + str(i)],
+                    'details': request.form['details-p' + str(i)],
+                }
+                pages.append(page)
+            lab = Lab(request.form['name'], encoded_image, tags, datetime.datetime.now, request.form['difficulty'],
+                    request.form['description'], pages, current_user.id)
+            lab.save()
+    labs = Lab.objects(pk_owner__contains=str(current_user.id))
+    print(labs)
+    return render_template('instructor/manage.html', page='Manage Labs', user=current_user, labs=labs)
 
 
 @app.route('/admin', methods=['GET', 'POST'])

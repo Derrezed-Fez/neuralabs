@@ -33,6 +33,8 @@ class ResetPasswordForm(FlaskForm):
 
 
 class LabForm(FlaskForm):
+    name = StringField('name', validators=[InputRequired(), Length(max=30)])
+    tags = StringField('tags')
     title = StringField('title')
 
 
