@@ -10,6 +10,7 @@ app.config['MONGODB_SETTINGS'] = {
     'host': 'mongodb://localhost:27017/'
 }
 app.config['UPLOAD_FOLDER'] = '/external'
+app.config['DEBUG'] = True
 
 db = MongoEngine(app)
 app.config['SECRET_KEY'] = 'development'

@@ -44,30 +44,33 @@
         </div>
         <h3><small><strong>Sequential Pages</strong></small></h3>
         <div id="sequential_pages">
-          <div class="medium-6 cell">
-            <label>Page 1 Title
-              <input type="text" placeholder="Pre-Lab Setup" name="title-p1">
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <label>Assignment Details
-              <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1"></textarea>
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <label>Scoring Engine Hash value&nbsp;
-              <input type="checkbox" id="score_engine_enable_1">
-              <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <div id="files-p1">
-
+          <div>
+            <div class="medium-6 cell">
+              <label class="title-label">Page 1 Title
+                <input type="text" placeholder="Pre-Lab Setup" name="title-p1">
+              </label>
             </div>
-            <label for="fileUpload1-p1" class="button">Upload External Media</label>
-            <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
+            <div class="medium-6 cell">
+              <label>Assignment Details
+                <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1"></textarea>
+              </label>
+            </div>
+            <div class="medium-6 cell">
+              <label>Scoring Engine Hash value&nbsp;
+                <input type="checkbox" id="score_engine_enable_1">
+                <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
+              </label>
+            </div>
+            <div class="medium-6 cell">
+              <div id="files-p1">
+
+              </div>
+              <label for="fileUpload1-p1" class="button">Upload External Media</label>
+              <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
+              <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
+            </div>
+            <input type="hidden" class="total-page-count"/>
           </div>
-          <input type="hidden" class="total-page-count"/>
         </div>
         <input id='total-page-count' type="hidden" name='total-page-count' value='0'/>
         <input class="button" onclick="addLabPage();" value="Add Another Page"/>

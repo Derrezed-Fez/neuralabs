@@ -106,12 +106,17 @@ def manage_labs():
             for tag in request.form['tags'].split(','):
                 tags.append(tag.strip())
             total_page_count = int(request.form['total-page-count'])
+            print(request.form)
             pages = []
-            for i in range(1, total_page_count+1):
-                file_name = request.form['fileUpload-1' + str(i)]
+            for i in range(1, total_page_count+2):
+                file_attachments = list()
+                for key, value in request.form.items():
+                    if 'fileUpload' in key:
+                        file_attachments.append(value)
                 page = {
                     'title': request.form['title-p' + str(i)],
                     'details': request.form['details-p' + str(i)],
+                    'files': file_attachments
                 }
                 pages.append(page)
             lab = Lab(request.form['name'], encoded_image, tags, datetime.datetime.now, request.form['difficulty'],
