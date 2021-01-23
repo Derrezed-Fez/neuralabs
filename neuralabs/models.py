@@ -47,3 +47,17 @@ class Course(db.Document):
     join_code = db.StringField(max_length=6)
     instructors = db.ListField()
     students = db.ListField()
+    roles = db.ListField(default=['Student'])
+    join_date = db.DateTimeField()
+
+
+class Lab(UserMixin, db.Document):
+    meta = {'collection': 'Lab'}
+    name = db.StringField(max_length=30)
+    image = db.BinaryField()
+    tags = db.ListField(defualt=[])
+    date_created = db.DateTimeField()
+    difficulty = db.StringField()
+    description = db.StringField()
+    pages = db.ListField(default=[])
+    pk_owner = db.ObjectIdField()

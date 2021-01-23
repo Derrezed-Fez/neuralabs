@@ -1,0 +1,30 @@
+{% extends 'navbar.html' %}
+
+{% block content %}
+    <div class="callout secondary">
+        <div class="row">
+            <div class="large-9 column">
+              <h1>Grades for {{ user.name }}</h1>
+              <p class="lead">Here's how you rank.</p>
+            </div>
+            {% include 'level.html' %}
+        </div>
+    </div>
+    <div style="width: 90%; margin: auto;">
+        <div class="small-6 columns">
+            <h3>Global Leaderboard</h3>
+            {% include 'leaderboard.html' %}
+        </div>
+        <div class="small-6 large-4 columns" style="text-align: end">
+            <h3>Current Grades</h3>
+            <table class="list unstriped hover" style="table-layout: fixed;">
+                <tbody>
+                    <tr><td><h5 style="margin-bottom: 0;">85%</h5></td><td style="width: 200px"><a href="/course/5fa0d45d9449c634e4a91792">Digital Forensics 2</a></td></tr>
+                    <tr><td><h5 style="margin-bottom: 0;">85%</h5></td><td style="width: 200px"><a href="/course/5fa0d45d9449c634e4a91792">Digital Forensics 2</a></td></tr>
+                    <tr><td><h5 style="margin-bottom: 0;">85%</h5></td><td style="width: 200px"><a href="/course/5fa0d45d9449c634e4a91792">Digital Forensics 2</a></td></tr>
+                    <tr><td><h5 style="margin-bottom: 0;">85%</h5></td><td style="width: 200px"><a href="/course/5fa0d45d9449c634e4a91792">Digital Forensics 2</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

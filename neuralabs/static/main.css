@@ -37,3 +37,11 @@
     background: lightseagreen;
     cursor: pointer;
 }
+.list tbody {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+}
+.list tr {
+    height: 70px;
+}

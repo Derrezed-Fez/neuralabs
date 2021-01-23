@@ -1,14 +1,22 @@
 {% extends 'navbar.html' %}
 
 {% block content %}
-          <div class="callout secondary">
-            <div class="row column">
-              <h1>Welcome back to Neuralabs!</h1>
-              <p class="lead">Here's how you rank, {{ user.name}}.</p>
+        <div class="callout secondary">
+            <div class="row">
+                <div class="large-9 column">
+                  <h1>Welcome to Neurolabs!</h1>
+                  <p class="lead">Complete labs to earn points.</p>
+                </div>
+                {% include 'level.html' %}
             </div>
-          </div>
+        </div>
           <div class="row">
-            <canvas id="stats" style="width: 500px; height: 500px;"></canvas>
+              <div class="large-4 column">
+                <canvas id="stats" style="width: 500px; height: 500px;"></canvas>
+              </div>
+              <div class="large-4 column">
+                <canvas id="stats" style="width: 500px; height: 500px;"></canvas>
+              </div>
           </div>
           <hr>
           <div class="row small-up-2 medium-up-3 large-up-4">

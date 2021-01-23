@@ -8,6 +8,7 @@ import datetime
 import string
 import random
 from flask import abort, jsonify
+import base64
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -95,7 +96,29 @@ def create_lab():
 @app.route('/manage')
 @login_required
 def manage_labs():
-    return render_template('instructor/manage.html', page='Manage Labs', user=current_user)
+    form = LabForm()
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            image = request.files['lab-photo']
+            encoded_image = base64.b64encode(image.read())
+            tags = []
+            for tag in request.form['tags'].split(','):
+                tags.append(tag.strip())
+            total_page_count = int(request.form['total-page-count'])
+            pages = []
+            for i in range(1, total_page_count+1):
+                file_name = request.form['fileUpload-1' + str(i)]
+                page = {
+                    'title': request.form['title-p' + str(i)],
+                    'details': request.form['details-p' + str(i)],
+                }
+                pages.append(page)
+            lab = Lab(name=request.form['name'], image=encoded_image, tags=tags, date_created=datetime.datetime.now, difficulty=request.form['difficulty'],
+                    description=request.form['description'], pages=pages, pk_owner=current_user.id)
+            lab.save()
+    labs = Lab.objects(pk_owner__contains=str(current_user.id))
+    print(labs)
+    return render_template('instructor/manage.html', page='Manage Labs', user=current_user, labs=labs)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -153,3 +176,9 @@ def instructors():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.route('/grades', methods=['GET'])
+@login_required
+def grade_book():
+    return render_template('gradebook.html', page='Grade Book', user=current_user)
