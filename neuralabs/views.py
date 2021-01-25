@@ -5,11 +5,13 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask import Flask, render_template, request, redirect, url_for
 from neuralabs.__init__ import app
 import datetime
+import base64
+import bson
+from bson.binary import Binary
 import string
 import random
 from flask import abort, jsonify
 import base64
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -90,11 +92,11 @@ def profile():
 @app.route('/create')
 @login_required
 def create_lab():
-    return render_template('instructor/create.html', page='Create Lab', user=current_user)
+    form = LabForm()
+    return render_template('instructor/create.html', page='Create Lab', user=current_user, form=form)
 
 
-@app.route('/manage')
-@login_required
+@app.route('/manage', methods=['GET', 'POST'])
 def manage_labs():
     form = LabForm()
     if request.method == 'POST':
@@ -111,6 +113,7 @@ def manage_labs():
                 page = {
                     'title': request.form['title-p' + str(i)],
                     'details': request.form['details-p' + str(i)],
+                    'files': file_attachments
                 }
                 pages.append(page)
             lab = Lab(name=request.form['name'], image=encoded_image, tags=tags, date_created=datetime.datetime.now, difficulty=request.form['difficulty'],
