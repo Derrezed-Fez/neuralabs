@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_login import LoginManager
+import logging
 
 # create and configure the app
 app = Flask(__name__)
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.INFO)
 
 app.config['MONGODB_SETTINGS'] = {
     'db': 'squirrel',

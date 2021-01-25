@@ -16,6 +16,7 @@ class User(UserMixin, db.Document):
     meta = {'collection': 'User'}
     name = db.StringField(max_length=30)
     email = db.StringField(max_length=30)
+    score = db.IntField(default=0)
     password = db.StringField()
     role = db.StringField(max_length=1, choices=roles.keys(), default='S')
     join_date = db.DateTimeField()
@@ -39,6 +40,15 @@ class User(UserMixin, db.Document):
     @property
     def role_color(self):
         return self.roles[self.role][1]
+
+    @property
+    def level(self):
+        level = self.score / 500  # 500 points per level, might change to exponential
+        return level
+
+    @property
+    def required_points(self):
+        return (self.level + 1) * 500
 
 
 class Course(db.Document):

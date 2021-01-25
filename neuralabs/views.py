@@ -19,7 +19,7 @@ def register():
             existing_user = User.objects(email=form.email.data).first()
             if existing_user is None:
                 hash_pass = generate_password_hash(form.password.data, method='pbkdf2:sha256:80000')
-                new_user = User(form.name.data, form.email.data, hash_pass)
+                new_user = User(name=form.name.data, email=form.email.data, password=hash_pass)
                 new_user.join_date = datetime.datetime.now
                 new_user.save()
                 login_user(new_user)
@@ -65,8 +65,8 @@ def reset_password():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user_courses = []
-    return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
+    user_labs = ['']*10
+    return render_template('dashboard.html', page='Dashboard', user=current_user, labs=user_labs)
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -181,4 +181,5 @@ def logout():
 @app.route('/grades', methods=['GET'])
 @login_required
 def grade_book():
-    return render_template('gradebook.html', page='Grade Book', user=current_user)
+    user_courses = Course.objects.all()
+    return render_template('gradebook.html', page='Grade Book', user=current_user, courses=user_courses)

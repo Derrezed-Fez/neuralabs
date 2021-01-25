@@ -10,62 +10,39 @@
                 {% include 'level.html' %}
             </div>
         </div>
-          <div class="row">
-              <div class="large-4 column">
-                <canvas id="stats" style="width: 500px; height: 500px;"></canvas>
-              </div>
-              <div class="large-4 column">
-                <canvas id="stats" style="width: 500px; height: 500px;"></canvas>
-              </div>
+          <div class="row gutter-small">
+             <div class="large-6 column">
+                  <div class="chart">
+                    <h5>Skill Distribution</h5>
+                    <div><canvas id="radar"></canvas></div>
+                  </div>
+             </div>
+            <div class="large-6 column">
+                <div class="chart">
+                    <h5>Grade Performance</h5>
+                    <div><canvas id="bar"></canvas></div>
+                </div>
+            </div>
           </div>
           <hr>
+            <ul class="stats-list">
+              <li>
+                5 <span class="stats-list-label">Completed</span>
+              </li>
+              <li class="stats-list-positive">
+                3 <span class="stats-list-label">Upcoming</span>
+              </li>
+              <li class="stats-list-negative">
+                2 <span class="stats-list-label">Missing</span>
+              </li>
+            </ul>
+            <hr>
           <div class="row small-up-2 medium-up-3 large-up-4">
-            {% for course in courses %}
+            {% for lab in labs %}
                 <div class="column">
-                  <img class="thumbnail" src="https://placehold.it/550x550">
-                  <h5>Test Lab</h5>
+                    {% include 'card-lab.html' %}
                 </div>
             {% endfor %}
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
           </div>
         </div>
     <script src="../static/dashboard.js"></script>
