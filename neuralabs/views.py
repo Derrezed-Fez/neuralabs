@@ -11,6 +11,7 @@ from bson.binary import Binary
 import string
 import random
 from flask import abort, jsonify
+import base64
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -20,7 +21,7 @@ def register():
             existing_user = User.objects(email=form.email.data).first()
             if existing_user is None:
                 hash_pass = generate_password_hash(form.password.data, method='pbkdf2:sha256:80000')
-                new_user = User(form.name.data, form.email.data, hash_pass)
+                new_user = User(name=form.name.data, email=form.email.data, password=hash_pass)
                 new_user.join_date = datetime.datetime.now
                 new_user.save()
                 login_user(new_user)
@@ -110,21 +111,17 @@ def manage_labs():
             for tag in request.form['tags'].split(','):
                 tags.append(tag.strip())
             total_page_count = int(request.form['total-page-count'])
-            print(request.form)
             pages = []
-            for i in range(1, total_page_count+2):
-                file_attachments = list()
-                for key, value in request.form.items():
-                    if 'fileUpload' in key:
-                        file_attachments.append(value)
+            for i in range(1, total_page_count+1):
+                file_name = request.form['fileUpload-1' + str(i)]
                 page = {
                     'title': request.form['title-p' + str(i)],
                     'details': request.form['details-p' + str(i)],
                     'files': file_attachments
                 }
                 pages.append(page)
-            lab = Lab(request.form['name'], encoded_image, tags, datetime.datetime.now, request.form['difficulty'],
-                    request.form['description'], pages, current_user.id)
+            lab = Lab(name=request.form['name'], image=encoded_image, tags=tags, date_created=datetime.datetime.now, difficulty=request.form['difficulty'],
+                    description=request.form['description'], pages=pages, pk_owner=current_user.id)
             lab.save()
     labs = Lab.objects(pk_owner__contains=str(current_user.id))
     print(labs)
@@ -219,3 +216,10 @@ def instructors():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.route('/grades', methods=['GET'])
+@login_required
+def grade_book():
+    user_courses = Course.objects.all()
+    return render_template('gradebook.html', page='Grade Book', user=current_user, courses=user_courses)
