@@ -20,8 +20,8 @@
     {% endif %}
     {% for lab in labs %}
       <div class="column">
-        <img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}">
-        <h5>{{lab.name}}</h5>
+        <a href="/edit-lab?id={{lab.id}}"><img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}"></a>
+        <a href="/edit-lab?id={{lab.id}}"><h5>{{lab.name}}</h5></a>
       </div>
     {% endfor %}
   </div>

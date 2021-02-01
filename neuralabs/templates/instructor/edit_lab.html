@@ -4,7 +4,7 @@
   <div class="title-bar hide-for-large">
     <div class="title-bar-left">
       <button class="menu-icon" type="button" data-open="my-info"></button>
-      <span class="title-bar-title">{{name}}</span>
+      <span class="title-bar-title">{{user.name}}</span>
     </div>
   </div>
   <div class="callout secondary">
@@ -13,16 +13,83 @@
     </div>
   </div>
   <hr />
-  <div class="row small-up-2 medium-up-3 large-up-4">
-    {% if not labs %}
-    <h5>You have not yet created any Labs</h5>
-    {% endif %}
-    {% for lab in labs %}
-      <div class="column">
-        <img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}">
-        <h5>{{lab.name}}</h5>
-      </div>
-    {% endfor %}
+  <div class='row'>
+    <center>
+      <form action="/edit-lab" method="POST" enctype=multipart/form-data>
+        <input type="hidden" name="id" value="{{lab.id}}">
+        <div class="grid-container">
+          <div class="grid-x grid-padding-x">
+            <h3><small><strong>Basic Lab Info</strong></small></h3>
+            <div class="medium-6 cell">
+              <label>Lab Name
+                <input type="text" name="name" value="{{lab.name}}">
+              </label>
+            </div>
+            <div class="medium-6 cell">
+              <label for="lab-photo" class="button">Upload Lab Photo</label>
+              <img id="image-preview" src="data:image/jpg;base64, {{lab.image.decode() | safe}}" alt="your image" />
+              <input type="file" id="lab-photo" class="show-for-sr" name="lab-photo">
+            </div>
+            <div class="medium-6 cell">
+              <label>Lab Tags (add up to 10 comma separated values)
+                <input type="text" name="tags" value="{{lab.tags}}">
+              </label>
+            </div>
+            <div class="medium-6 cell">
+              <label>Lab Difficulty
+                <select name="difficulty">
+                  <option value="easy" {% if lab.difficulty == 'easy' %} selected {% endif %}>Easy</option>
+                  <option value="medium" {% if lab.difficulty == 'medium' %} selected {% endif %}>Medium</option>
+                  <option value="hard" {% if lab.difficulty == 'hard' %} selected {% endif %}>Hard</option>
+                  <option value="impossible" {% if lab.difficulty == 'impossible' %} selected {% endif %}>Impossible</option>
+                </select>
+              </label>
+          </div>
+          <div class="medium-6 cell">
+            <label>Description
+              <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..." name="description">{{lab.description}}</textarea>
+            </label>
+          </div>
+          <h3><small><strong>Sequential Pages</strong></small></h3>
+          <div id="sequential_pages">
+            {% for page in lab.pages %}
+              <div>
+                <div class="medium-6 cell">
+                  <label class="title-label">Page 1 Title
+                    <input type="text" placeholder="Pre-Lab Setup" name="title-p1" value="{{page.title}}">
+                  </label>
+                </div>
+                <div class="medium-6 cell">
+                  <label>Assignment Details
+                    <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1">{{page.details}}</textarea>
+                  </label>
+                </div>
+                <div class="medium-6 cell">
+                  <label>Scoring Engine Hash value&nbsp;
+                    <input type="checkbox" id="score_engine_enable_1">
+                    <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
+                  </label>
+                </div>
+                <div class="medium-6 cell">
+                  <div id="files-p1">
+                    {% for file in page.files %}
+                      {{file}}
+                    {% endfor %}
+                  </div>
+                  <label for="fileUpload1-p1" class="button">Upload External Media</label>
+                  <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
+                  <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
+                </div>
+                <input type="hidden" class="total-page-count"/>
+              </div>
+            </div>
+          {% endfor %}
+          <input id='total-page-count' type="hidden" name='total-page-count' value='0'/>
+          <input class="button" onclick="addLabPage();" value="Add Another Page"/>
+          <input class="button" style="background-color:green;" type="submit" value="Update Lab"/>
+        </div>
+      </form>
+    </center>
   </div>
 </div>
 {% endblock %}

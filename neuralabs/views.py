@@ -67,7 +67,11 @@ def reset_password():
 @login_required
 def dashboard():
     user_courses = []
-    return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
+    if current_user.is_authenticated:
+        labs = Lab.objects()
+        return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
+    else:
+        return render_template('unauthorized.html')
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -126,6 +130,39 @@ def manage_labs():
     print(labs)
     return render_template('instructor/manage.html', page='Manage Labs', user=current_user, labs=labs)
 
+@app.route('/edit-lab', methods=['GET', 'POST'])
+def edit_lab():
+    if current_user.is_authenticated:
+        if request.method == 'GET':
+            lab_id = request.args.get('id')
+            lab = Lab.objects(id__contains=str(lab_id))[0]
+            lab['tags'] = ', '.join(lab['tags'])
+        elif request.method == "POST":
+            image = request.files['lab-photo']
+            encoded_image = base64.b64encode(image.read())
+            tags = []
+            for tag in request.form['tags'].split(','):
+                tags.append(tag.strip())
+            total_page_count = int(request.form['total-page-count'])
+            print(request.form)
+            pages = []
+            for i in range(1, total_page_count+2):
+                file_attachments = list()
+                for key, value in request.form.items():
+                    if 'fileUpload' in key:
+                        file_attachments.append(value)
+                page = {
+                    'title': request.form['title-p' + str(i)],
+                    'details': request.form['details-p' + str(i)],
+                    'files': file_attachments
+                }
+                pages.append(page)
+            db.Lab.update({'_id': request.form['id']}, {'$set': {'tags': tags, 'name': request.form['name'],
+                'image': image, 'difficulty': request.form['difficulty'], 'description': request.form['description'],
+                'pages': pages}})
+        return render_template('instructor/edit_lab.html', lab=lab, user=current_user)
+    else:
+        return render_template('unautherized.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required

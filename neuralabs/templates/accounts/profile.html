@@ -50,12 +50,16 @@
                         </th>
                     </tr>
                     <tbody>
+                      {% if enrolled_courses %}
                         {% for course in enrolled_courses %}
                             <tr><td>{{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
                         {% endfor %}
+                      {% endif %}
+                      {% if instructor_courses %}
                         {% for course in instructor_courses %}
                             <tr><td>[Instructor] {{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
                         {% endfor %}
+                      {% endif %}
                     </tbody>
                 </thead>
             </table>
