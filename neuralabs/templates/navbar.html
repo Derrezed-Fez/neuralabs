@@ -20,7 +20,7 @@
                 {% if user.is_student %}
                     <a href="/grades"><i class="fi-book"></i> Grade Book</a>
                 {% elif user.is_instructor %}
-                    <a href="/manage"><i class="fi-wrench"></i> Manage Labs</a>
+                    <a href="/manage"><i class="fi-wrench"></i> Manage Course Content</a>
                 {% elif user.is_admin %}
                     <a href="/admin"><i class="fi-wrench"></i> Admin</a>
                 {% endif %}

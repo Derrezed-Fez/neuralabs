@@ -67,9 +67,18 @@ def reset_password():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user_courses = []
     if current_user.is_authenticated:
-        labs = Lab.objects()
+        if current_user.is_admin:
+            user_courses = Course.objects.all()
+        elif current_user.is_instructor:
+            user_courses = Course.objects(instructors__contains=current_user.id)
+        elif current_user.is_student:
+            user_courses = Course.objects(students__contains=current_user.id)
+        else:
+            user_courses = False
+        if user_courses:
+            for course in user_courses:
+                course['labs'] = Lab.objects(fk_course=course.id)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
     else:
         return render_template('unauthorized.html')
@@ -93,11 +102,17 @@ def profile():
                            enrolled_courses=enrolled_courses, instructor_courses=instructor_courses)
 
 
-@app.route('/create')
+@app.route('/create-course')
+@login_required
+def create_course():
+    form = CourseForm()
+    return render_template('instructor/create_course.html', page='Create Course', user=current_user, form=form)
+
+@app.route('/create-lab')
 @login_required
 def create_lab():
     form = LabForm()
-    return render_template('instructor/create.html', page='Create Lab', user=current_user, form=form)
+    return render_template('instructor/create_lab.html', page='Create Lab', user=current_user, form=form)
 
 
 @app.route('/manage', methods=['GET', 'POST'])

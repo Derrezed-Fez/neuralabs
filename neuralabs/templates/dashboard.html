@@ -4,7 +4,7 @@
         <div class="callout secondary">
             <div class="row">
                 <div class="large-9 column">
-                  <h1>Welcome to Neurolabs!</h1>
+                  <h1>Welcome to Neuralabs!</h1>
                   <p class="lead">Complete labs to earn points.</p>
                 </div>
                 {% include 'level.html' %}
@@ -38,12 +38,30 @@
             </ul>
             <hr>
           <div class="row small-up-2 medium-up-3 large-up-4">
-            {% for lab in labs %}
+            {% if courses %}
               <div class="column">
-                <a href="/edit-lab?id={{lab.id}}"><img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}"></a>
-                <a href="/edit-lab?id={{lab.id}}"><h5>{{lab.name}}</h5></a>
+                <ul class="accordion" data-accordion>
+                {% for course in courses %}
+                    <li class="accordion-item is-active" data-accordion-item>
+                      <a href="#" class="accordion-title">{{course.title}}</a>
+                      <div class="accordion-content" data-tab-content>
+                      {% for lab in course.labs %}
+                        {% if current_user.is_student %}
+                          <a href="/take-lab?id={{lab.id}}"><img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}"></a>
+                          <a href="/take-lab?id={{lab.id}}"><p>{{lab.name}}</p></a>
+                        {% elif current_user.is_instructor or current_user.is_admin %}
+                          <a href="/edit-lab?id={{lab.id}}"><img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}"></a>
+                          <a href="/edit-lab?id={{lab.id}}"><p>{{lab.name}}</p></a>
+                        {% endif %}
+                      {% endfor %}
+                      </div>
+                    </li>
+                {% endfor %}
+                </ul>
               </div>
-            {% endfor %}
+            {% else %}
+              <h5>You are not yet associated with any courses.</h5>
+            {% endif %}
           </div>
         </div>
     <script src="../static/dashboard.js"></script>

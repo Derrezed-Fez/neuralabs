@@ -60,7 +60,6 @@ class Course(db.Document):
     roles = db.ListField(default=['Student'])
     join_date = db.DateTimeField()
 
-    
 class Lab(UserMixin, db.Document):
     meta = {'collection': 'Lab'}
     name = db.StringField(max_length=30)
@@ -71,3 +70,4 @@ class Lab(UserMixin, db.Document):
     description = db.StringField()
     pages = db.ListField(default=[])
     pk_owner = db.ObjectIdField()
+    fk_course = db.ObjectIdField()
