@@ -29,9 +29,11 @@
                         </th>
                     </tr>
                     <tbody>
-                        {% for student in students %}
-                            <tr><td>{{ student.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove={{ student.id }}">Remove</a>{% endif %}</td></tr>
-                        {% endfor %}
+                        {% if students %}
+                          {% for student in students %}
+                              <tr><td>{{ student.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove={{ student.id }}">Remove</a>{% endif %}</td></tr>
+                          {% endfor %}
+                        {% endif %}
                     </tbody>
                 </thead>
         </table>
@@ -44,9 +46,11 @@
                         </th>
                     </tr>
                     <tbody>
+                      {% if instructors %}
                         {% for instructor in instructors %}
                             <tr><td>{{ instructor.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove_instructor={{ instructor.id }}">Remove</a>{% endif %}</td></tr>
                         {% endfor %}
+                      {% endif %}
                     </tbody>
                 </thead>
         </table>

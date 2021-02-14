@@ -36,7 +36,15 @@
                 <option value="impossible">Impossible</option>
               </select>
             </label>
-        </div>
+          </div>
+          <div class="medium-6 cell">
+            <label>What Course is this lab for?
+            <select name="course">
+              {% for course in courses %}
+                <option value="{{course.id}}">{{course.title}}</option>
+              {% endfor %}
+            </select>
+          </div>
         <div class="medium-6 cell">
           <label>Description
             <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..." name="description"></textarea>
@@ -58,7 +66,10 @@
             <div class="medium-6 cell">
               <label>Scoring Engine Hash value&nbsp;
                 <input type="checkbox" id="score_engine_enable_1">
-                <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
+                <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1" name="score_engine_value_1"/>
+              </label>
+              <label>How many points is this worth? (must be a number)
+                <input type="number" id="score_engine_points_1" name="score_engine_points_1"/>
               </label>
             </div>
             <div class="medium-6 cell">
@@ -72,7 +83,7 @@
             <input type="hidden" class="total-page-count"/>
           </div>
         </div>
-        <input id='total-page-count' type="hidden" name='total-page-count' value='0'/>
+        <input id='total-page-count' type="hidden" name='total-page-count' value='2'/>
         <input class="button" onclick="addLabPage();" value="Add Another Page"/>
         <input class="button" style="background-color:green;" type="submit" value="Create Lab"/>
       </div>

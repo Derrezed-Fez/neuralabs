@@ -71,15 +71,18 @@ def dashboard():
         if current_user.is_admin:
             user_courses = Course.objects.all()
         elif current_user.is_instructor:
-            user_courses = Course.objects(instructors__contains=current_user.id)
+            user_courses = Course.objects(instructors__contains=str(current_user.id))
         elif current_user.is_student:
-            user_courses = Course.objects(students__contains=current_user.id)
+            user_courses = Course.objects(students__contains=str(current_user.id))
         else:
             user_courses = False
+        labs = {}
+        print(user_courses)
         if user_courses:
             for course in user_courses:
-                course['labs'] = Lab.objects(fk_course=course.id)
-        return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses)
+                labs[str(course.id)] = Lab.objects(fk_course=str(course.id))
+        print(labs)
+        return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return render_template('unauthorized.html')
 
@@ -97,6 +100,7 @@ def profile():
             else:
                 form.errors['invalid'] = ['Join code does not exist.']
     enrolled_courses = Course.objects(students__contains=str(current_user.id))
+    print(enrolled_courses)
     instructor_courses = Course.objects(instructors__contains=str(current_user.id))
     return render_template('accounts/profile.html', page='Profile', user=current_user, form=form,
                            enrolled_courses=enrolled_courses, instructor_courses=instructor_courses)
@@ -112,7 +116,9 @@ def create_course():
 @login_required
 def create_lab():
     form = LabForm()
-    return render_template('instructor/create_lab.html', page='Create Lab', user=current_user, form=form)
+    courses = Course.objects(instructors__contains=str(current_user.id))
+    print(courses)
+    return render_template('instructor/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses)
 
 
 @app.route('/manage', methods=['GET', 'POST'])
@@ -127,16 +133,16 @@ def manage_labs():
                 tags.append(tag.strip())
             total_page_count = int(request.form['total-page-count'])
             pages = []
-            for i in range(1, total_page_count+1):
-                file_name = request.form['fileUpload-1' + str(i)]
+            for i in range(1, total_page_count):
                 page = {
                     'title': request.form['title-p' + str(i)],
                     'details': request.form['details-p' + str(i)],
-                    'files': file_attachments
+                    'hash': request.form['score_engine_value_' + str(i)],
+                    'points': request.form['score_engine_points_' + str(i)]
                 }
                 pages.append(page)
             lab = Lab(name=request.form['name'], image=encoded_image, tags=tags, date_created=datetime.datetime.now, difficulty=request.form['difficulty'],
-                    description=request.form['description'], pages=pages, pk_owner=current_user.id)
+                    description=request.form['description'], pages=pages, pk_owner=current_user.id, fk_course=request.form['course'])
             lab.save()
     labs = Lab.objects(pk_owner__contains=str(current_user.id))
     print(labs)
@@ -189,6 +195,7 @@ def admin():
             new_course.save()
             return redirect(url_for('admin'))
     courses = Course.objects.all()
+    print(courses)
     return render_template('administration/admin.html', page='Admin', user=current_user, form=form, courses=courses)
 
 

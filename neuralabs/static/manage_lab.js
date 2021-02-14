@@ -1,11 +1,13 @@
 function addLabPage() {
-  var pageCount = $('.total-page-count').length;
+  var pageCount = $('.total-page-count').length + 2;
   $('#total-page-count').val(pageCount);
   var page = `<div><div class="medium-6 cell"><label class="title-label">Page ${pageCount + 1} Title<input type="text" placeholder="Pre-Lab Setup"
   name="title-p${pageCount+1}"></label></div><div class="medium-6 cell"><label>Assignment Details<textarea style="height:100px;"
     placeholder="Step 1: boot up your VM..." name="details-p${pageCount+1}"></textarea></label></div><div class="medium-6 cell">
     <label>Scoring Engine Hash value&nbsp;<input type="checkbox" id="score_engine_enable_${pageCount+1}"><input type="text"
-    placeholder="0xc0ffee" disabled id="score_engine_value_${pageCount+1}"/></label></div><div class="medium-6 cell">
+    placeholder="0xc0ffee" disabled id="score_engine_value_${pageCount+1}"/></label><label>How many points is this worth? (must be a number)
+    <input type="number" id="score_engine_points_${pageCount+1}"  name="score_engine_value_${pageCount+1}"
+    name="score_engine_points_${pageCount+1}"/></label></div><div class="medium-6 cell">
     <label for="fileUpload1-p${pageCount + 1}" class="button">Upload External Media</label><input type="file"
     id="fileUpload1-p${pageCount + 1}" class="show-for-sr" name="fileUpload1-p${pageCount + 1}"
     onchange="displayUploadedFiles(this, 'files-p${pageCount + 1}');" /><input class="button" style="background-color:red; margin-left:5px;"
@@ -36,6 +38,8 @@ function removeLabPage(event) {
     pages[j].querySelectorAll('input[type=file]')[0].setAttribute('id', 'fileUpload1-p' + i);
     pages[j].querySelectorAll('input[type=file]')[0].setAttribute('name', 'fileUpload1-p' + i);
     pages[j].querySelectorAll('input[type=file]')[0].setAttribute('onchange', "displayUploadedFiles(this, 'files-p" + i + "');");
+    pages[j],querySelectorAll('input[type=number]')[0].setAttribute('id', 'score_engine_points_' + i);
+    pages[j],querySelectorAll('input[type=number]')[0].setAttribute('name', 'score_engine_points_' + i);
     i++;
   }
 }

@@ -19,9 +19,11 @@
             <h3>Current Grades</h3>
             <table class="list unstriped hover" style="table-layout: fixed;">
                 <tbody>
+                  {% if courses %}
                     {% for course in courses %}
                         <tr><td><h5 style="margin-bottom: 0;">85%</h5></td><td style="width: 200px"><a href="/course/{{ course.id }}">{{ course.title }}</a></td></tr>
                     {% endfor %}
+                  {% endif %}
                 </tbody>
             </table>
         </div>
