@@ -15,15 +15,15 @@
             <h5>Neuralabs</h5>
         </a>
             <div id="sidenav-buttons">
+                {% if user.is_admin %}
+                    <a href="/admin"><i class="fi-lock"></i> Admin</a>
+                    <hr>
+                {% endif %}
                 <a href="/dashboard"><i class="fi-layout"></i> Dashboard</a>
                 <hr>
-                {% if user.is_student %}
-                    <a href="/grades"><i class="fi-book"></i> Grade Book</a>
-                {% elif user.is_instructor %}
-                    <a href="/manage"><i class="fi-wrench"></i> Manage Labs</a>
-                {% elif user.is_admin %}
-                    <a href="/admin"><i class="fi-wrench"></i> Admin</a>
-                {% endif %}
+                <a href="/scores"><i class="fi-book"></i> Leaderboard</a>
+                <hr>
+                <a href="/manage"><i class="fi-wrench"></i> Create Labs</a>
                 <hr>
                 <a href="/profile"><i class="fi-torso"></i> Profile</a>
                 <hr>

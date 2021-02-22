@@ -4,6 +4,22 @@
 h1 {
     font-weight: 600;
 }
+#email, #password {
+    box-shadow: none;
+}
+.form-icon {
+    background: #1779ba;
+    text-align: center;
+    color: white;
+    height: 2.4375rem;
+}
+.account-form {
+    max-width: 600px;
+    margin: auto;
+    padding: 25px;
+    box-shadow: 0 20px 50px 10px rgb(91 91 91 / 5%);
+    border-radius: 10px;
+}
 
 #sidenav-buttons {
     margin: 50px auto;
@@ -27,16 +43,16 @@ h1 {
     border-right: 1px #f1f1f1 solid;
 }
 
-#instructor-results {
+#user-results {
     border: 1px solid #cacaca;
     text-indent: 10px;
 }
 
-.instructor-result {
+.user-result {
     background: white;
     padding: 5px;
 }
-.instructor-result:hover {
+.user-result:hover {
     background: lightseagreen;
     cursor: pointer;
 }
@@ -162,4 +178,8 @@ h1 {
     color: white;
     background-color: #1779ba;
     border-radius: 5px;
+}
+
+.nomargin {
+    margin: 0;
 }

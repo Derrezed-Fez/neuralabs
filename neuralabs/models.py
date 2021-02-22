@@ -7,10 +7,13 @@ def load_user(user_id):
     return User.objects(pk=user_id).first()
 
 
+class School(db.Document):
+    name = db.StringField()
+
+
 class User(UserMixin, db.Document):
     roles = {
-        'S': ('Student', '#3adb76'),
-        'I': ('Instructor', '#1f84ef'),
+        'U': ('User', '#3adb76'),
         'A': ('Admin', '#e3073c')
     }
     meta = {'collection': 'User'}
@@ -18,20 +21,15 @@ class User(UserMixin, db.Document):
     email = db.StringField(max_length=30)
     score = db.IntField(default=0)
     password = db.StringField()
-    role = db.StringField(max_length=1, choices=roles.keys(), default='S')
+    role = db.StringField(max_length=1, choices=roles.keys(), default='U')
     join_date = db.DateTimeField()
+    # User Settings:
+    opt_out = db.BooleanField(default=False)
+    school = db.ReferenceField(School)
 
     @property
     def is_admin(self):
         return self.role == 'A'
-
-    @property
-    def is_student(self):
-        return self.role == 'S'
-
-    @property
-    def is_instructor(self):
-        return self.role == 'I'
 
     @property
     def role_display(self):
@@ -55,15 +53,20 @@ class Course(db.Document):
     meta = {'collection': 'Course'}
     title = db.StringField(max_length=50)
     join_code = db.StringField(max_length=6)
-    instructors = db.ListField()
-    students = db.ListField()
+    instructors = db.ListField(db.ReferenceField(User))
+    students = db.ListField(db.ReferenceField(User))
     roles = db.ListField(default=['Student'])
     join_date = db.DateTimeField()
 
-    
+
+class Tag(db.Document):
+    tag = db.StringField(max_length=30)
+
+
 class Lab(UserMixin, db.Document):
     meta = {'collection': 'Lab'}
     name = db.StringField(max_length=30)
+    course_id = db.StringField()
     image = db.BinaryField()
     tags = db.ListField(defualt=[])
     date_created = db.DateTimeField()
@@ -71,3 +74,7 @@ class Lab(UserMixin, db.Document):
     description = db.StringField()
     pages = db.ListField(default=[])
     pk_owner = db.ObjectIdField()
+
+    @property
+    def course(self):
+        return Course.objects(id=self.course_id).first()

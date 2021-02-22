@@ -1,29 +1,27 @@
 {% extends 'navbar.html' %}
 {% block content %}
-<div class="off-canvas-content" data-off-canvas-content>
-  <div class="title-bar hide-for-large">
-    <div class="title-bar-left">
-      <button class="menu-icon" type="button" data-open="my-info"></button>
-      <span class="title-bar-title">{{name}}</span>
-    </div>
-  </div>
   <div class="callout secondary">
     <div class="row column">
       <h1>Lab Management Console</h1>
-      <button class="button" onclick="location.href='/create'">Create New Lab</button>
+      <a href='/create' class="button">Create New Lab</a>
     </div>
   </div>
-  <hr />
+    <div class="row" style="padding: 0 10px 0 10px">
+        <a href="?filter=all" class="button small nomargin">All Courses</a>
+        <a href="?filter=all" class="button small hollow nomargin">Digital Forensics 2</a>
+        <a href="?filter=all" class="button small hollow nomargin">Incident Response</a>
+    </div>
+  <hr/>
   <div class="row small-up-2 medium-up-3 large-up-4">
     {% if not labs %}
-    <h5>You have not yet created any Labs</h5>
-    {% endif %}
-    {% for lab in labs %}
-      <div class="column">
-        <img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}">
-        <h5>{{lab.name}}</h5>
-      </div>
+        <h5>You have not yet created any Labs</h5>
+    {% else %}
+        {% for lab in labs %}
+            <div class="column">
+                {% include 'card-lab.html' %}
+            </div>
     {% endfor %}
+  {% endif %}
   </div>
 </div>
 {% endblock %}
