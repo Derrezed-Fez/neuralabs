@@ -71,3 +71,10 @@ class Lab(UserMixin, db.Document):
     pages = db.ListField(default=[])
     pk_owner = db.ObjectIdField()
     fk_course = db.ObjectIdField()
+
+class LabAttempt(UserMixin, db.Document):
+    meta = {'collection': 'LabAttempt'}
+    time_submitted = db.DateTimeField()
+    answers = db.ListField(default=[])
+    points = db.IntField()
+    fk_student = db.ObjectIdField()

@@ -12,6 +12,7 @@ import string
 import random
 from flask import abort, jsonify
 import base64
+from scoringEngine import ScoringEngine
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -77,10 +78,11 @@ def dashboard():
         else:
             user_courses = False
         labs = {}
-        print(user_courses)
-        if user_courses:
-            for course in user_courses:
-                labs[str(course.id)] = Lab.objects(fk_course=str(course.id))
+        # print(user_courses)
+        # if user_courses:
+        #     for course in user_courses:
+        #         labs[str(course.id)] = Lab.objects(fk_course=str(course.id))
+        labs = Lab.objects()
         print(labs)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
@@ -245,3 +247,34 @@ def logout():
 def grade_book():
     user_courses = Course.objects.all()
     return render_template('gradebook.html', page='Grade Book', user=current_user, courses=user_courses)
+
+@app.route('/take-lab', methods=['GET'])
+@login_required
+def take_lab():
+    lab_id = request.args.get('id')
+    lab = Lab.objects(id=lab_id).first()
+    print(lab)
+    return render_template('/accounts/take-lab.html', user=current_user, lab=lab)
+
+@app.route('/lab-complete', methods=['POST'])
+@login_required
+def lab_complete():
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            lab = Lab.objects(id=request.form.get('lab_id')).first()
+            modified_answers = dict()
+            counter = 1
+            for key, value in request.form.items():
+                if key != 'lab_id':
+                    modified_answers['page' + str(counter)] = value
+            engine = ScoringEngine(scoring_type='comparison', answers=modified_answers, key=lab.pages)
+            points = engine.calculateScore()
+            completion_time = datetime.datetime.now()
+            attempt = LabAttempt(time_submitted=completion_time, answers=[modified_answers], points=points, fk_student=current_user.id)
+            attempt.save()
+
+            return render_template('accounts/lab-complete.html', lab_completion_time=completion_time.strftime("%m/%d/%Y, %H:%M:%S"), points=points, user=current_user)
+        else:
+            return render_template('unautherized.html')
+    else:
+        return render_template('unautherized.html')
