@@ -78,19 +78,9 @@ def dashboard():
     if current_user.is_authenticated:
         if current_user.is_admin:
             user_courses = Course.objects.all()
-        elif current_user.is_instructor:
-            user_courses = Course.objects(instructors__contains=current_user)
-        elif current_user.is_student:
-            user_courses = Course.objects(students__contains=current_user)
         else:
-            user_courses = False
-        labs = {}
-        # print(user_courses)
-        # if user_courses:
-        #     for course in user_courses:
-        #         labs[str(course.id)] = Lab.objects(fk_course=str(course.id))
+            user_courses = Course.objects(students__contains=current_user)
         labs = Lab.objects()
-        #print(labs)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return render_template('unauthorized.html')
@@ -105,21 +95,34 @@ def profile():
         if join_code:
             course = Course.objects(join_code=join_code).first()
             if course:
-                course.update(push__students=str(current_user.id))
+                course.update(push__students=current_user.id)
             else:
                 form.errors['invalid'] = ['Join code does not exist.']
-    enrolled_courses = Course.objects(students__contains=str(current_user.id))
-    print(enrolled_courses)
-    instructor_courses = Course.objects(instructors__contains=str(current_user.id))
+    enrolled_courses = Course.objects(students__contains=current_user.id)
+    instructor_courses = Course.objects(instructors__contains=current_user.id)
+    schools = School.objects.all()
     return render_template('accounts/profile.html', page='Profile', user=current_user, form=form,
-                           enrolled_courses=enrolled_courses, instructor_courses=instructor_courses)
+                           enrolled_courses=enrolled_courses, instructor_courses=instructor_courses, schools=schools)
 
 
-@app.route('/create-course')
+@app.route('/change_setting', methods=['POST'])
 @login_required
-def create_course():
-    form = CourseForm()
-    return render_template('labs/create_course.html', page='Create Course', user=current_user, form=form)
+def change_setting():
+    if request.method == 'POST':
+        setting = request.form.get('setting')
+        value = request.form.get('value')
+        if setting == 'setting_school':
+            if value == 'None':
+                current_user.update(unset__school=True)
+            else:
+                school = School.objects(id=value).first()
+                if school:
+                    current_user.school = school
+        if setting == 'setting_private':
+            current_user.private = value == 'true'
+        current_user.save()
+
+    return app.response_class(response={'status': 'success'}, status=200, mimetype='application/json')
 
 
 @app.route('/create-lab', methods=['GET', 'POST'])
@@ -164,39 +167,38 @@ def manage_labs():
     return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs)
 
 
-@app.route('/edit-lab', methods=['GET', 'POST'])
-def edit_lab():
+@app.route('/edit-lab/<lab_id>', methods=['GET', 'POST'])
+def edit_lab(lab_id):
     if current_user.is_authenticated:
-        if request.method == 'GET':
-            lab_id = request.args.get('id')
-            lab = Lab.objects(id__contains=str(lab_id))[0]
-            lab['tags'] = ', '.join(lab['tags'])
-        elif request.method == "POST":
-            image = request.files['lab-photo']
-            encoded_image = base64.b64encode(image.read())
-            tags = []
-            for tag in request.form['tags'].split(','):
-                tags.append(tag.strip())
-            total_page_count = int(request.form['total-page-count'])
-            print(request.form)
-            pages = []
-            for i in range(1, total_page_count+2):
-                file_attachments = list()
-                for key, value in request.form.items():
-                    if 'fileUpload' in key:
-                        file_attachments.append(value)
-                page = {
-                    'title': request.form['title-p' + str(i)],
-                    'details': request.form['details-p' + str(i)],
-                    'files': file_attachments
-                }
-                pages.append(page)
-            db.Lab.update({'_id': request.form['id']}, {'$set': {'tags': tags, 'name': request.form['name'],
-                'image': image, 'difficulty': request.form['difficulty'], 'description': request.form['description'],
-                'pages': pages}})
-        return render_template('labs/edit_lab.html', lab=lab, user=current_user)
-    else:
-        return render_template('unautherized.html')
+        lab = Lab.objects(id=lab_id).first()
+        if lab.owner == current_user or current_user.is_admin:
+            if request.method == 'GET':
+                lab['tags'] = ', '.join(lab['tags'])
+            elif request.method == "POST":
+                image = request.files['lab-photo']
+                encoded_image = base64.b64encode(image.read())
+                tags = []
+                for tag in request.form['tags'].split(','):
+                    tags.append(tag.strip())
+                total_page_count = int(request.form['total-page-count'])
+                print(request.form)
+                pages = []
+                for i in range(1, total_page_count+2):
+                    file_attachments = list()
+                    for key, value in request.form.items():
+                        if 'fileUpload' in key:
+                            file_attachments.append(value)
+                    page = {
+                        'title': request.form[f'title-p{i}'],
+                        'details': request.form[f'details-p{i}'],
+                        'files': file_attachments
+                    }
+                    pages.append(page)
+                db.Lab.update({'_id': request.form['id']}, {'$set': {'tags': tags, 'name': request.form['name'],
+                    'image': image, 'difficulty': request.form['difficulty'], 'description': request.form['description'],
+                    'pages': pages}})
+            return render_template('labs/edit_lab.html', lab=lab, user=current_user)
+    return render_template('unautherized.html')
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -204,16 +206,43 @@ def edit_lab():
 def admin():
     if not current_user.is_admin:
         abort(403, description='User does not have permission to access.')
-    form = CourseForm()
-    if request.method == 'POST':
-        if form.validate_on_submit() and current_user.is_admin:
-            new_course = Course(title=form.title.data)
-            new_course.join_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-            new_course.save()
-            return redirect(url_for('admin'))
+
     courses = Course.objects.all()
-    print(courses)
-    return render_template('administration/admin.html', page='Admin', user=current_user, form=form, courses=courses)
+    tags = Tag.objects.all()
+    schools = School.objects.all()
+
+    return render_template('administration/admin.html', page='Admin', user=current_user, course_form=CourseForm(), courses=courses, tag_form=TagForm(), tags=tags, school_form=SchoolForm(), schools=schools)
+
+
+@app.route('/create_course', methods=['POST'])
+@login_required
+def create_course():
+    form = CourseForm()
+    if request.method == 'POST' and form.validate_on_submit() and current_user.is_admin:
+        new_course = Course(name=form.name.data)
+        new_course.join_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        new_course.save()
+        return redirect(url_for('admin'))
+
+
+@app.route('/create_tag', methods=['POST'])
+@login_required
+def create_tag():
+    form = TagForm()
+    if request.method == 'POST' and form.validate_on_submit() and current_user.is_admin:
+        new_tag = Tag(name=form.name.data)
+        new_tag.save()
+        return redirect(url_for('admin'))
+
+
+@app.route('/create_school', methods=['POST'])
+@login_required
+def create_school():
+    form = SchoolForm()
+    if request.method == 'POST' and form.validate_on_submit() and current_user.is_admin:
+        new_school = School(name=form.name.data)
+        new_school.save()
+        return redirect(url_for('admin'))
 
 
 @app.route('/course/<course_id>')
@@ -244,13 +273,37 @@ def manage_course(course_id):
                            students=students, instructors=instructors, has_perms=has_perms)
 
 
+@app.route('/delete_course/<course_id>')
+@login_required
+def delete_course(course_id):
+    if current_user.is_admin:
+        Course.objects(id=course_id).first().delete()
+    return redirect('/admin')
+
+
+@app.route('/delete_school/<school_id>')
+@login_required
+def delete_school(school_id):
+    if current_user.is_admin:
+        School.objects(id=school_id).first().delete()
+    return redirect('/admin')
+
+
+@app.route('/delete_tag/<tag_id>')
+@login_required
+def delete_tag(tag_id):
+    if current_user.is_admin:
+        Tag.objects(id=tag_id).first().delete()
+    return redirect('/admin')
+
+
 @app.route('/search_users')
 @login_required
 def search_users():
     if current_user.is_admin:
         query = request.values.get('q')
         if query:
-            instructors = User.objects(name__icontains=query).only('id', 'name')
+            instructors = User.objects(name__icontains=query).only('id', 'name', 'school')
             return jsonify(instructors)
 
 

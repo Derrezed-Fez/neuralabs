@@ -12,7 +12,7 @@
                     success: function (data) {
                         $('#user-results').empty();
                         for (user in data) {
-                            $('#user-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["email"] + '</span></div>')
+                            $('#user-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["school"] + '</span></div>')
                         }
                         $('.user-result').click(function(event) {
                             $('#user_id').val(event.target.id);

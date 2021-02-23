@@ -39,7 +39,15 @@ class LabForm(FlaskForm):
 
 
 class CourseForm(FlaskForm):
-    title = StringField('title', validators=[InputRequired()])
+    name = StringField('name', validators=[InputRequired()])
+
+
+class SchoolForm(FlaskForm):
+    name = StringField('name', validators=[InputRequired()])
+
+
+class TagForm(FlaskForm):
+    name = StringField('name', validators=[InputRequired()])
 
 
 class JoinForm(FlaskForm):

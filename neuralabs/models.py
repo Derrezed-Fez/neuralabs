@@ -24,7 +24,7 @@ class User(UserMixin, db.Document):
     role = db.StringField(max_length=1, choices=roles.keys(), default='U')
     join_date = db.DateTimeField()
     # User Settings:
-    opt_out = db.BooleanField(default=False)
+    private = db.BooleanField(default=False)
     school = db.ReferenceField(School)
 
     @property
@@ -51,7 +51,7 @@ class User(UserMixin, db.Document):
 
 class Course(db.Document):
     meta = {'collection': 'Course'}
-    title = db.StringField(max_length=50)
+    name = db.StringField(max_length=50)
     join_code = db.StringField(max_length=6)
     instructors = db.ListField(db.ReferenceField(User))
     students = db.ListField(db.ReferenceField(User))
@@ -60,7 +60,7 @@ class Course(db.Document):
 
 
 class Tag(db.Document):
-    tag = db.StringField(max_length=30)
+    name = db.StringField(max_length=30)
 
 
 class Lab(UserMixin, db.Document):

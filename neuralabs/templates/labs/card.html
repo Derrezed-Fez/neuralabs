@@ -1,9 +1,9 @@
 <div class="card">
-    <a href="/lab/{{ lab.id }}"><img class="card-img" src="https://placehold.it/350x300" alt="header"/></a>
+    <a href="/{% if request.path == '/manage' %}edit-lab{% else %}lab{% endif %}/{{ lab.id }}"><img class="card-img" src="https://placehold.it/350x300" alt="header"/></a>
     <div class="card-info">
-        <a href="/lab/{{ lab.id }}" class="card-title">Lab 1</a>
+        <a href="/{% if request.path == '/manage' %}edit-lab{% else %}lab{% endif %}/{{ lab.id }}" class="card-title">{{ lab.name }}</a>
         <div class="card-points">+{{ lab.total_points }}</div>
-        <a href="/course/{{ lab.course }}" class="card-course">{{ lab.course}}</a>
+        <a href="/course/{{ lab.course }}" class="card-course">{{ lab.course }}</a>
         <p class="card-stats" title="Lab Difficulty Level">{{ lab.difficulty }} <i class="fi-puzzle"></i></p>
     </div>
 </div>

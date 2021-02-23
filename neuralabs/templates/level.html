@@ -1,5 +1,5 @@
 <div class="large-3 column">
-    <h5 style="margin-bottom: 10px; font-weight: bolder;"><i class="fi-trophy"></i> LEVEL {{ user.level|int }}<span style="float: right; font-size: 10px">{{ user.score|int }}/{{ user.required_points|int }}xp</span></h5>
+    <h5 style="margin-bottom: 10px; font-weight: bolder;"><i class="fi-trophy"></i> LEVEL {{ user.level|int }}<span style="float: right; font-size: 10px">{{ user.score|int }}/{{ user.required_points|int }} points</span></h5>
     <div class="progress" role="progressbar" tabindex="0" aria-valuenow="{{ user.score|int }}" aria-valuemin="0" aria-valuetext="{{ user.score|int }}" aria-valuemax="{{ user.required_points|int }}">
       <span class="progress-meter" style="width: {{ (user.score / user.required_points) * 100 }}%">
       </span>
