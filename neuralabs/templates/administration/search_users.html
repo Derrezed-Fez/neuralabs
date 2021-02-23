@@ -1,0 +1,27 @@
+<input style="margin-bottom: 0" type="text" id="user-search" placeholder="Username" maxlength="30" required>
+<input type="hidden" id="user_id" name="select_user">
+<div id="user-results"></div>
+<script>
+    $(document).ready(function () {
+        $('#user-search').on('keyup paste', function () {
+            if (this.value.length >= 3) {
+                $.ajax({
+                    type: "get",
+                    url: "/search_users",
+                    data: {q: this.value},
+                    success: function (data) {
+                        $('#user-results').empty();
+                        for (user in data) {
+                            $('#user-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["email"] + '</span></div>')
+                        }
+                        $('.user-result').click(function(event) {
+                            $('#user_id').val(event.target.id);
+                            $(this).closest('form').submit();
+                        })
+                    }
+                });
+            }
+        });
+
+    });
+</script>

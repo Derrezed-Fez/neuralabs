@@ -3,6 +3,7 @@ from neuralabs.models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import Flask, render_template, request, redirect, url_for
+from mongoengine.queryset.visitor import Q
 from neuralabs.__init__ import app
 import datetime
 import base64
@@ -20,8 +21,13 @@ def register():
     form = RegForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            existing_user = User.objects(email=form.email.data).first()
-            if existing_user is None:
+            existing_email = User.objects(email=form.email.data).first()
+            existing_username = User.objects(username=form.name.data).first()
+            if existing_username:
+                form.errors['username'] = ['Username is already in use.']
+            if existing_email:
+                form.errors['email'] = ['Email is already in use.']
+            if not existing_email and not existing_username:
                 hash_pass = generate_password_hash(form.password.data, method='pbkdf2:sha256:80000')
                 new_user = User(name=form.name.data, email=form.email.data, password=hash_pass)
                 new_user.join_date = datetime.datetime.now
@@ -220,27 +226,31 @@ def manage_course(course_id):
     students = User.objects(id__in=course.students)
     instructors = User.objects(id__in=course.instructors)
     has_perms = current_user.is_admin or current_user in instructors
+
     if has_perms and request.values.get('remove'):
         course.update(pull__students=request.values.get('remove'))
         return redirect(url_for('manage_course', course_id=course_id))
-    if has_perms and request.values.get('add_instructor'):
-        course.update(pull__students=request.values.get('add_instructor'))
-        course.update(push__instructors=request.values.get('add_instructor'))
+
+    if has_perms and request.values.get('select_user'):
+        course.update(pull__students=request.values.get('select_user'))
+        course.update(push__instructors=request.values.get('select_user'))
         return redirect(url_for('manage_course', course_id=course_id))
+
     if has_perms and request.values.get('remove_instructor'):
         course.update(pull__instructors=request.values.get('remove_instructor'))
         return redirect(url_for('manage_course', course_id=course_id))
+
     return render_template('administration/course.html', page='Course', user=current_user, course=course,
                            students=students, instructors=instructors, has_perms=has_perms)
 
 
-@app.route('/instructors')
+@app.route('/search_users')
 @login_required
-def instructors():
+def search_users():
     if current_user.is_admin:
         query = request.values.get('q')
         if query:
-            instructors = User.objects(role__in=['I', 'A'], name__icontains=query).values_list('id', 'name', 'email')
+            instructors = User.objects(name__icontains=query).only('id', 'name')
             return jsonify(instructors)
 
 
@@ -251,11 +261,11 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/grades', methods=['GET'])
+@app.route('/scores', methods=['GET'])
 @login_required
 def grade_book():
     user_courses = Course.objects.all()
-    return render_template('gradebook.html', page='Grade Book', user=current_user, courses=user_courses)
+    return render_template('scores.html', page='Grade Book', user=current_user, courses=user_courses)
 
 
 @app.route('/lab/<lab_id>', methods=['GET'])

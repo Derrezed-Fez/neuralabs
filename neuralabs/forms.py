@@ -19,8 +19,8 @@ class RegForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email address.'), Length(max=30)])
-    password = PasswordField('password')
+    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email address.'), Length(max=30)], render_kw={"placeholder": "Email"})
+    password = PasswordField('password', render_kw={"placeholder": "Password"})
 
 
 class ChangePasswordForm(FlaskForm):
