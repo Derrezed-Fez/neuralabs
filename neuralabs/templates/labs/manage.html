@@ -19,10 +19,9 @@
     <h5>You have not yet created any Labs</h5>
     {% endif %}
     {% for lab in labs %}
-      <div class="column">
-        <a href="/edit-lab?id={{lab.id}}"><img class="thumbnail" src="data:image/jpg;base64, {{lab.image.decode() | safe}}"></a>
-        <a href="/edit-lab?id={{lab.id}}"><h5>{{lab.name}}</h5></a>
-      </div>
+        <div class="column">
+            {% include 'labs/card.html' %}
+        </div>
     {% endfor %}
   </div>
 </div>

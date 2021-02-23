@@ -60,21 +60,27 @@ class Course(db.Document):
     roles = db.ListField(default=['Student'])
     join_date = db.DateTimeField()
 
+
 class Lab(UserMixin, db.Document):
     meta = {'collection': 'Lab'}
     name = db.StringField(max_length=30)
     image = db.BinaryField()
-    tags = db.ListField(defualt=[])
+    tags = db.ListField(default=[])
     date_created = db.DateTimeField()
     difficulty = db.StringField()
     description = db.StringField()
     pages = db.ListField(default=[])
-    pk_owner = db.ObjectIdField()
-    fk_course = db.ObjectIdField()
+    owner = db.ReferenceField(User)
+    course = db.ReferenceField(Course)
+
+    @property
+    def total_points(self):
+        return sum([page['points'] for page in self.pages])
+
 
 class LabAttempt(UserMixin, db.Document):
     meta = {'collection': 'LabAttempt'}
     time_submitted = db.DateTimeField()
     answers = db.ListField(default=[])
     points = db.IntField()
-    fk_student = db.ObjectIdField()
+    student = db.ReferenceField(User)

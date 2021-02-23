@@ -14,6 +14,7 @@ from flask import abort, jsonify
 import base64
 from scoringEngine import ScoringEngine
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegForm()
@@ -72,9 +73,9 @@ def dashboard():
         if current_user.is_admin:
             user_courses = Course.objects.all()
         elif current_user.is_instructor:
-            user_courses = Course.objects(instructors__contains=str(current_user.id))
+            user_courses = Course.objects(instructors__contains=current_user)
         elif current_user.is_student:
-            user_courses = Course.objects(students__contains=str(current_user.id))
+            user_courses = Course.objects(students__contains=current_user)
         else:
             user_courses = False
         labs = {}
@@ -83,7 +84,7 @@ def dashboard():
         #     for course in user_courses:
         #         labs[str(course.id)] = Lab.objects(fk_course=str(course.id))
         labs = Lab.objects()
-        print(labs)
+        #print(labs)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return render_template('unauthorized.html')
@@ -112,43 +113,50 @@ def profile():
 @login_required
 def create_course():
     form = CourseForm()
-    return render_template('instructor/create_course.html', page='Create Course', user=current_user, form=form)
+    return render_template('labs/create_course.html', page='Create Course', user=current_user, form=form)
 
-@app.route('/create-lab')
+
+@app.route('/create-lab', methods=['GET', 'POST'])
 @login_required
 def create_lab():
     form = LabForm()
-    courses = Course.objects(instructors__contains=str(current_user.id))
-    print(courses)
-    return render_template('instructor/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses)
+
+    if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
+        image = request.files['lab-photo']
+        encoded_image = base64.b64encode(image.read())
+        tags = [tag.strip for tag in request.form['tags'].split(',')]
+        total_page_count = int(request.form['total-page-count'])
+        pages = []
+        for i in range(1, total_page_count):
+            page = {
+                'title': request.form[f'title-p{i}'],
+                'details': request.form[f'details-p{i}'],
+                'hash': request.form[f'score_engine_value_{i}'],
+                'points': int(request.form[f'score_engine_points_{i}'])
+            }
+            pages.append(page)
+        lab = Lab(
+            name=request.form['name'],
+            image=encoded_image,
+            date_created=datetime.datetime.now,
+            difficulty=request.form['difficulty'],
+            description=request.form['description'],
+            pages=pages,
+            owner=current_user.id,
+            course=request.form.get('course', None)
+        )
+        lab.save()
+        return redirect('/manage')
+
+    courses = Course.objects(instructors__contains=current_user.id)
+    return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses)
 
 
-@app.route('/manage', methods=['GET', 'POST'])
+@app.route('/manage', methods=['GET'])
 def manage_labs():
-    form = LabForm()
-    if request.method == 'POST':
-        if current_user.is_authenticated:
-            image = request.files['lab-photo']
-            encoded_image = base64.b64encode(image.read())
-            tags = []
-            for tag in request.form['tags'].split(','):
-                tags.append(tag.strip())
-            total_page_count = int(request.form['total-page-count'])
-            pages = []
-            for i in range(1, total_page_count):
-                page = {
-                    'title': request.form['title-p' + str(i)],
-                    'details': request.form['details-p' + str(i)],
-                    'hash': request.form['score_engine_value_' + str(i)],
-                    'points': request.form['score_engine_points_' + str(i)]
-                }
-                pages.append(page)
-            lab = Lab(name=request.form['name'], image=encoded_image, tags=tags, date_created=datetime.datetime.now, difficulty=request.form['difficulty'],
-                    description=request.form['description'], pages=pages, pk_owner=current_user.id, fk_course=request.form['course'])
-            lab.save()
-    labs = Lab.objects(pk_owner__contains=str(current_user.id))
-    print(labs)
-    return render_template('instructor/manage.html', page='Manage Labs', user=current_user, labs=labs)
+    labs = Lab.objects(owner=current_user.id)
+    return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs)
+
 
 @app.route('/edit-lab', methods=['GET', 'POST'])
 def edit_lab():
@@ -180,9 +188,10 @@ def edit_lab():
             db.Lab.update({'_id': request.form['id']}, {'$set': {'tags': tags, 'name': request.form['name'],
                 'image': image, 'difficulty': request.form['difficulty'], 'description': request.form['description'],
                 'pages': pages}})
-        return render_template('instructor/edit_lab.html', lab=lab, user=current_user)
+        return render_template('labs/edit_lab.html', lab=lab, user=current_user)
     else:
         return render_template('unautherized.html')
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -248,13 +257,14 @@ def grade_book():
     user_courses = Course.objects.all()
     return render_template('gradebook.html', page='Grade Book', user=current_user, courses=user_courses)
 
-@app.route('/take-lab', methods=['GET'])
+
+@app.route('/lab/<lab_id>', methods=['GET'])
 @login_required
-def take_lab():
-    lab_id = request.args.get('id')
+def take_lab(lab_id):
     lab = Lab.objects(id=lab_id).first()
     print(lab)
-    return render_template('/accounts/take-lab.html', user=current_user, lab=lab)
+    return render_template('/labs/take-lab.html', user=current_user, lab=lab)
+
 
 @app.route('/lab-complete', methods=['POST'])
 @login_required
