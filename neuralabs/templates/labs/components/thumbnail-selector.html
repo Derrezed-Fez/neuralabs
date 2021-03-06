@@ -1,0 +1,17 @@
+<label>Thumbnail Image {% if lab and lab.default_image == 1 %}checked="checked"{% endif %}</label>
+<fieldset>
+    <div class="row small-up-5 collapsed image-selector">
+        <label class="column thumbnail-option" style="margin: 0 0 1rem;">
+            <label style="padding: 0; border: 0;" class="button" for="lab-photo">
+                <div id="image-preview" class="thumbnail-upload"><i class="fi-upload" style="font-size: 30px; filter: opacity(0.5);"></i></div>
+            </label>
+            <input type="file" id="lab-photo" class="show-for-sr" name="lab-photo">
+            <input type="radio" name="thumbnail" id="upload-check" value=0 class="show-for-sr" {% if lab and lab.default_thumbnail == 0 %}checked="checked"{% endif %}>
+        </label>
+
+        <label class="column thumbnail-option"><input type="radio" name="thumbnail" value=1 class="show-for-sr" {% if (lab and lab.default_thumbnail == 1) or not lab %}checked="checked"{% endif %}><img class="thumbnail-preview" src="{{ url_for('static', filename='thumbnails/default-1.png') }}"></label>
+        <label class="column thumbnail-option"><input type="radio" name="thumbnail" value=2 class="show-for-sr" {% if lab and lab.default_thumbnail == 2 %}checked="checked"{% endif %}><img class="thumbnail-preview" src="{{ url_for('static', filename='thumbnails/default-2.png') }}"></label>
+        <label class="column thumbnail-option"><input type="radio" name="thumbnail" value=3 class="show-for-sr" {% if lab and lab.default_thumbnail == 3 %}checked="checked"{% endif %}><img class="thumbnail-preview" src="{{ url_for('static', filename='thumbnails/default-3.png') }}"></label>
+        <label class="column thumbnail-option"><input type="radio" name="thumbnail" value=4 class="show-for-sr" {% if lab and lab.default_thumbnail == 4 %}checked="checked"{% endif %}><img class="thumbnail-preview" src="{{ url_for('static', filename='thumbnails/default-4.png') }}"></label>
+    </div>
+</fieldset>

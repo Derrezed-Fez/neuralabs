@@ -1,6 +1,6 @@
 <input style="margin-bottom: 0" type="text" id="user-search" placeholder="Username" maxlength="30" required>
 <input type="hidden" id="user_id" name="select_user">
-<div id="user-results"></div>
+<div id="search-results" style="border: 1px solid gray;"></div>
 <script>
     $(document).ready(function () {
         $('#user-search').on('keyup paste', function () {
@@ -10,9 +10,9 @@
                     url: "/search_users",
                     data: {q: this.value},
                     success: function (data) {
-                        $('#user-results').empty();
+                        $('#search-results').empty();
                         for (user in data) {
-                            $('#user-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["school"] + '</span></div>')
+                            $('#search-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result search-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["school"] + '</span></div>')
                         }
                         $('.user-result').click(function(event) {
                             $('#user_id').val(event.target.id);

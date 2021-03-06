@@ -2,99 +2,72 @@
 {% block content %}
 <div class="callout secondary">
   <div class="row column">
-    <h1>Create New Lab</h1>
+    <h1>Lab Editor</h1>
   </div>
 </div>
-<hr />
-<div class='row'>
-  <center>
-    <form action="/create-lab" method="POST" enctype=multipart/form-data>
-    {{ form.hidden_tag() }}
-      <div class="grid-container">
-        <div class="grid-x grid-padding-x">
-            {% include 'form-feedback.html' %}
-          <h3><small><strong>Basic Lab Info</strong></small></h3>
-          <div class="medium-6 cell">
-            <label>Lab Name
-              {{form.name}}
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <label for="lab-photo" class="button">Upload Lab Photo</label>
-            <img id="image-preview" src="#" alt="your image" />
-            <input type="file" id="lab-photo" class="show-for-sr" name="lab-photo">
-          </div>
-          <div class="medium-6 cell">
-            <label>Lab Tags (add up to 10 comma separated values)
-              {{form.tags}}
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <label>Lab Difficulty
-              <select name="difficulty">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-                <option value="impossible">Impossible</option>
-              </select>
-            </label>
-          </div>
-          <div class="medium-6 cell">
-            <label>What Course is this lab for?
-            <select name="course">
-              {% for course in courses %}
-                <option value="{{course.id}}">{{course.name}}</option>
-              {% endfor %}
-            </select>
-          </div>
-        <div class="medium-6 cell">
-          <label>Description
-            <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..." name="description"></textarea>
-          </label>
-        </div>
-        <h3><small><strong>Sequential Pages</strong></small></h3>
+<div class='row center'>
+    <form action="{% if lab %}/edit-lab/{{ lab.id }}{% else %}/create-lab{% endif %}" method="POST" enctype=multipart/form-data class="large-9 columns sections" id="labForm" data-mutate="labEdit">
+        {{ form.hidden_tag() }}
+        {% include 'form-feedback.html' %}
+        <section id="lab_details" data-magellan-target="lab_details">
+            <div class="cell">
+                <label>Lab Name
+                    <input type="text" name="name" value="{% if lab %}{{lab.name}}{% endif %}" required>
+                </label>
+            </div>
+            <div class="cell">
+                {% include 'labs/components/thumbnail-selector.html' %}
+            </div>
+            <div class="cell">
+                {% include 'labs/components/tag-selector.html' %}
+            </div>
+            <div class="cell">
+                {% include 'labs/components/difficulty-selector.html' %}
+            </div>
+            <div class="cell">
+                <label>What Course is this lab for?
+                <select name="course">
+                    {% for course in courses %}
+                        <option value="{{course.id}}">{{course.name}}</option>
+                    {% endfor %}
+                </select>
+                </label>
+            </div>
+            <div class="cell">
+              <label>Description
+                <textarea style="height:100px;" placeholder="A basic intro into capturing and analying volatile memory..." name="description">{% if lab %}{{ lab.description }}{% endif %}</textarea>
+              </label>
+            </div>
+        </section>
+        <h3><small><strong>Lab Pages</strong></small></h3>
         <div id="sequential_pages">
-          <div>
-            <div class="medium-6 cell">
-              <label class="title-label">Page 1 Title
-                <input type="text" placeholder="Pre-Lab Setup" name="title-p1">
-              </label>
-            </div>
-            <div class="medium-6 cell">
-              <label>Assignment Details
-                <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1"></textarea>
-              </label>
-            </div>
-            <div class="medium-6 cell">
-              <label>Scoring Engine Hash value&nbsp;
-                <input type="checkbox" id="score_engine_enable_1">
-                <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1" name="score_engine_value_1"/>
-              </label>
-              <label>How many points is this worth? (must be a number)
-                <input type="number" id="score_engine_points_1" name="score_engine_points_1"/>
-              </label>
-            </div>
-            <div class="medium-6 cell">
-              <div id="files-p1">
-
-              </div>
-              <label for="fileUpload1-p1" class="button">Upload External Media</label>
-              <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
-              <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
-            </div>
-            <input type="hidden" class="total-page-count"/>
-          </div>
+        <hr style="border-bottom: 1px dashed #c3c3c3;">
+            {% if lab %}
+                {% for page in lab.pages %}
+                    {% include 'labs/components/page.html' %}
+                {% endfor %}
+            {% else %}
+                {% include 'labs/components/page.html' %}
+            {% endif %}
         </div>
-        <input id='total-page-count' type="hidden" name='total-page-count' value='2'/>
-        <input class="button" onclick="addLabPage();" value="Add Another Page"/>
-        <input class="button" style="background-color:green;" type="submit" value="Create Lab"/>
-      </div>
+        <section id="publish" data-magellan-target="publish">
+            <input id='total-page-count' type="hidden" name='total-page-count' value='2'/>
+            <input class="button" onclick="addLabPage();" value="Add Another Page"/>
+            <input class="button" style="background-color:green;" type="submit" value="Publish Lab"/>
+        </section>
     </form>
-  </center>
+
+    <nav class="large-3 columns sticky-container show-for-large" data-sticky-container>
+      <div class="sticky is-at-top is-stuck" data-sticky>
+        <ul class="vertical menu lab-nav" data-offset="130" style="margin-top: 9em; text-indent: 10px;" data-magellan>
+            <li style="background-color: lightseagreen; color: white;font-weight: 600;">Lab Editor</li>
+            <li><a href="#lab_details">Lab Details</a></li>
+            <li><a href="#page_1">Page 1<i style="color: red; float: right;" class="fi-x" title="Delete Page"></i></a></li>
+            <li><a href="#publish">Publish Lab</a></li>
+        </ul>
+      </div>
+    </nav>
 </div>
-<script
-  src="https://code.jquery.com/jquery-3.5.1.min.js"
-  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-  crossorigin="anonymous"></script>
+    <script>$(document).foundation();</script>
 <script src="/static/manage_lab.js"></script>
 {% endblock %}

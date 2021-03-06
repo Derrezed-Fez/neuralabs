@@ -1,0 +1,44 @@
+<label>Lab Tags
+    <div style="margin: 0 0 1rem;" >
+        <div id="tags"></div>
+        <input style="margin-bottom: 0" type="text" id="tag-search" placeholder="Tags" maxlength="30" onmousedown="search_tags(this.value)">
+        <div id="search-results" style="display: none;">
+            {% for tag in tags %}
+                <div id="{{ tag.id }}" class="tag-result search-result" onclick="add_tag(this)">#{{ tag.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        function add_tag(tag) {
+            $('#tag-search').val('');
+            $('#search-results').css('display', 'none');
+            $('#tags').append('<div class="tag">' + tag.innerHTML + ' <i class="fi-x"></i><input type="hidden" name="tag[]" value="' + tag.id + '"></div>');
+            $('.tag').click(function(event) {
+                event.currentTarget.remove();
+            });
+        }
+        function search_tags(query) {
+            $.ajax({
+                    type: "get",
+                    url: "/tags",
+                    data: {q: query},
+                    success: function (data) {
+                        $('#search-results').empty();
+                        for (tag in data) {
+                            $('#search-results').css('display', 'block');
+                            $('#search-results').append('<div id="' + data[tag]["_id"]["$oid"] + '" class="tag-result search-result">#' + data[tag]["name"] + '</div>');
+                        }
+                        $('.tag-result').click(function(event) {
+                            add_tag(event.target);
+                        });
+                        $('#search-results').css('display', 'block');
+                    }
+                });
+        }
+        $(document).ready(function () {
+            $('#tag-search').on('keyup paste', function () {
+                search_tags(this.value);
+            });
+        });
+    </script>
+</label>

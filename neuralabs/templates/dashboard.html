@@ -37,17 +37,23 @@
               </li>
             </ul>
             <hr>
-          <div class="row">
-              <ul class="accordion" data-accordion>
-              {% for lab in labs %}
-                  <div class="row small-up-2 medium-up-3 large-up-4">
-                      <div class="column">
-                        {% include 'labs/card.html' %}
-                      </div>
-                  </div>
-              {% endfor %}
-              </ul>
-          </div>
-        </div>
+            <div class="row row-padding small-12">
+                <ul class="accordion" data-accordion role="tablist" data-multi-expand="true">
+                    {% for course in courses %}
+                        <li class="accordion-navigation is-active">
+                            <a href="#{{ course.id }}" role="tab" class="accordion-title" id="{{ course.id }}-heading" aria-controls="{{ course.id }}">{{ course.name }}</a>
+                            <div id="{{ course.id }}" class="accordion-content" role="tabpanel" data-tab-content aria-labelledby="{{ course.id }}-heading">
+                                <div class="row small-up-2 medium-up-3 large-up-4 collapsed">
+                                    {% for lab in course.labs %}
+                                        <div class="column">
+                                            {% include 'labs/card.html' %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
     <script src="../static/dashboard.js"></script>
   {% endblock %}

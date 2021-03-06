@@ -1,13 +1,13 @@
 function addLabPage() {
   var pageCount = $('.total-page-count').length + 2;
   $('#total-page-count').val(pageCount);
-  var page = `<div><div class="medium-6 cell"><label class="title-label">Page ${pageCount + 1} Title<input type="text" placeholder="Pre-Lab Setup"
-  name="title-p${pageCount+1}"></label></div><div class="medium-6 cell"><label>Assignment Details<textarea style="height:100px;"
-    placeholder="Step 1: boot up your VM..." name="details-p${pageCount+1}"></textarea></label></div><div class="medium-6 cell">
+  var page = `<div><div class="cell"><label class="title-label">Page ${pageCount + 1} Title<input type="text" placeholder="Pre-Lab Setup"
+  name="title-p${pageCount+1}"></label></div><div class="cell"><label>Assignment Details<textarea style="height:100px;"
+    placeholder="Step 1: boot up your VM..." name="details-p${pageCount+1}"></textarea></label></div><div class="cell">
     <label>Scoring Engine Hash value&nbsp;<input type="checkbox" id="score_engine_enable_${pageCount+1}"><input type="text"
     placeholder="0xc0ffee" disabled id="score_engine_value_${pageCount+1}"/></label><label>How many points is this worth? (must be a number)
     <input type="number" id="score_engine_points_${pageCount+1}"  name="score_engine_value_${pageCount+1}"
-    name="score_engine_points_${pageCount+1}"/></label></div><div class="medium-6 cell">
+    name="score_engine_points_${pageCount+1}"/></label></div><div class="cell">
     <label for="fileUpload1-p${pageCount + 1}" class="button">Upload External Media</label><input type="file"
     id="fileUpload1-p${pageCount + 1}" class="show-for-sr" name="fileUpload1-p${pageCount + 1}"
     onchange="displayUploadedFiles(this, 'files-p${pageCount + 1}');" /><input class="button" style="background-color:red; margin-left:5px;"
@@ -56,11 +56,10 @@ $('#score_engine_enable_1').change(function() {
 function readURL(input) {
   if (input.files && input.files[0]) {
     var reader = new FileReader();
-
     reader.onload = function(e) {
-      $('#image-preview').attr('src', e.target.result);
+      document.getElementById('image-preview').style.backgroundImage = 'url("' + e.target.result + '")';
+      document.getElementById('upload-check').checked = true;
     }
-
     reader.readAsDataURL(input.files[0]); // convert to base64 string
   }
 }
