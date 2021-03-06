@@ -1,0 +1,33 @@
+<section id="page_1" data-magellan-target="page_1">
+<div>
+    <div class="cell">
+      <label class="title-label">Page 1 Title
+        <input type="text" placeholder="Pre-Lab Setup" name="title-p1" value="{% if lab %}{{page.title}}{% endif %}">
+      </label>
+    </div>
+    <div class="cell">
+      <label>Assignment Details
+        <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1">{% if lab %}{{page.details}}{% endif %}</textarea>
+      </label>
+    </div>
+    <div class="cell">
+      <label>Scoring Engine Hash value&nbsp;
+        <input type="checkbox" id="score_engine_enable_1">
+        <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
+      </label>
+    </div>
+    <div class="cell">
+      <div id="files-p1">
+        {% if lab %}
+            {% for file in page.files %}
+              {{file}}
+            {% endfor %}
+        {% endif %}
+      </div>
+      <label for="fileUpload1-p1" class="button">Upload External Media</label>
+      <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
+      <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
+    </div>
+</div>
+<hr style="border-bottom: 1px dashed #c3c3c3;">
+</section>

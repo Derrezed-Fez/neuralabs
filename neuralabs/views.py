@@ -14,6 +14,17 @@ import random
 from flask import abort, jsonify
 import base64
 from scoringEngine import ScoringEngine
+from mongoengine.queryset.visitor import Q
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('errors/404_not_found.html'), 404
+
+
+@app.errorhandler(403)
+def page_unauthorized(e):
+    return render_template('errors/403_unauthorized.html'), 403
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -79,11 +90,11 @@ def dashboard():
         if current_user.is_admin:
             user_courses = Course.objects.all()
         else:
-            user_courses = Course.objects(students__contains=current_user)
+            user_courses = Course.objects(Q(students__contains=current_user) | Q(instructors__contains=current_user))
         labs = Lab.objects()
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
-        return render_template('unauthorized.html')
+        return abort(403, description="User must login.")
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -129,24 +140,23 @@ def change_setting():
 @login_required
 def create_lab():
     form = LabForm()
+    tags = Tag.objects.all()
 
     if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
-        image = request.files['lab-photo']
-        encoded_image = base64.b64encode(image.read())
-        tags = [tag.strip for tag in request.form['tags'].split(',')]
-        total_page_count = int(request.form['total-page-count'])
+        total_page_count = int(request.form.get('total-page-count', 0))
         pages = []
         for i in range(1, total_page_count):
             page = {
                 'title': request.form[f'title-p{i}'],
                 'details': request.form[f'details-p{i}'],
-                'hash': request.form[f'score_engine_value_{i}'],
-                'points': int(request.form[f'score_engine_points_{i}'])
+                'hash': request.form.get(f'score_engine_value_{i}', None),
+                'points': int(request.form.get(f'score_engine_points_{i}', 0))
             }
             pages.append(page)
+
         lab = Lab(
             name=request.form['name'],
-            image=encoded_image,
+            default_thumbnail=request.form['thumbnail'],
             date_created=datetime.datetime.now,
             difficulty=request.form['difficulty'],
             description=request.form['description'],
@@ -155,35 +165,45 @@ def create_lab():
             course=request.form.get('course', None)
         )
         lab.save()
+        if request.files and 'lab-photo' in request.files:
+            image = request.files['lab-photo']
+            lab.update(custom_thumbnail=base64.b64encode(image.read()))
         return redirect('/manage')
 
     courses = Course.objects(instructors__contains=current_user.id)
-    return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses)
+    return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses,
+                           tags=tags)
 
 
 @app.route('/manage', methods=['GET'])
 def manage_labs():
     labs = Lab.objects(owner=current_user.id)
-    return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs)
+
+    course_filter = request.values.get('filter', 'all')
+    if course_filter != 'all':
+        course = Course.objects(id=course_filter).first()
+        if course:
+            labs = labs.filter(course=course)
+
+    courses = Course.objects(instructors__contains=current_user.id)
+    return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs, courses=courses,
+                           filter=course_filter)
 
 
 @app.route('/edit-lab/<lab_id>', methods=['GET', 'POST'])
 def edit_lab(lab_id):
+    form = LabForm()
+
     if current_user.is_authenticated:
         lab = Lab.objects(id=lab_id).first()
+        tags = Tag.objects.all()
         if lab.owner == current_user or current_user.is_admin:
-            if request.method == 'GET':
-                lab['tags'] = ', '.join(lab['tags'])
-            elif request.method == "POST":
+            if request.method == "POST" and form.validate_on_submit():
                 image = request.files['lab-photo']
                 encoded_image = base64.b64encode(image.read())
-                tags = []
-                for tag in request.form['tags'].split(','):
-                    tags.append(tag.strip())
                 total_page_count = int(request.form['total-page-count'])
-                print(request.form)
                 pages = []
-                for i in range(1, total_page_count+2):
+                for i in range(1, total_page_count + 2):
                     file_attachments = list()
                     for key, value in request.form.items():
                         if 'fileUpload' in key:
@@ -191,14 +211,26 @@ def edit_lab(lab_id):
                     page = {
                         'title': request.form[f'title-p{i}'],
                         'details': request.form[f'details-p{i}'],
+                        'hash': request.form[f'score_engine_value_{i}'],
+                        'points': int(request.form.get(f'score_engine_points_{i}', 0)),
                         'files': file_attachments
                     }
                     pages.append(page)
-                db.Lab.update({'_id': request.form['id']}, {'$set': {'tags': tags, 'name': request.form['name'],
-                    'image': image, 'difficulty': request.form['difficulty'], 'description': request.form['description'],
-                    'pages': pages}})
-            return render_template('labs/edit_lab.html', lab=lab, user=current_user)
-    return render_template('unautherized.html')
+                lab.update(
+                    name=request.form['name'],
+                    default_thumbnail=request.form['thumbnail'],
+                    custom_thumbnail=encoded_image,
+                    date_created=datetime.datetime.now,
+                    difficulty=request.form['difficulty'],
+                    description=request.form['description'],
+                    pages=pages,
+                    owner=current_user.id,
+                    course=request.form.get('course', None)
+                )
+                return redirect('/manage')
+            return render_template('labs/create_lab.html', lab=lab, user=current_user, page='Edit Lab', form=form,
+                                   tags=tags)
+    return abort(403, description="User must login.")
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -211,7 +243,8 @@ def admin():
     tags = Tag.objects.all()
     schools = School.objects.all()
 
-    return render_template('administration/admin.html', page='Admin', user=current_user, course_form=CourseForm(), courses=courses, tag_form=TagForm(), tags=tags, school_form=SchoolForm(), schools=schools)
+    return render_template('administration/admin.html', page='Admin', user=current_user, course_form=CourseForm(),
+                           courses=courses, tag_form=TagForm(), tags=tags, school_form=SchoolForm(), schools=schools)
 
 
 @app.route('/create_course', methods=['POST'])
@@ -252,17 +285,17 @@ def manage_course(course_id):
     if not course:
         abort(404, description='Course not found.')
 
-    students = User.objects(id__in=course.students)
-    instructors = User.objects(id__in=course.instructors)
-    has_perms = current_user.is_admin or current_user in instructors
+    has_perms = current_user.is_admin or current_user in course.instructors
 
     if has_perms and request.values.get('remove'):
         course.update(pull__students=request.values.get('remove'))
         return redirect(url_for('manage_course', course_id=course_id))
 
     if has_perms and request.values.get('select_user'):
-        course.update(pull__students=request.values.get('select_user'))
-        course.update(push__instructors=request.values.get('select_user'))
+        user = User.objects(id=request.values.get('select_user')).first()
+        if user:
+            course.update(pull__students=user)
+            course.update(push__instructors=user)
         return redirect(url_for('manage_course', course_id=course_id))
 
     if has_perms and request.values.get('remove_instructor'):
@@ -270,7 +303,7 @@ def manage_course(course_id):
         return redirect(url_for('manage_course', course_id=course_id))
 
     return render_template('administration/course.html', page='Course', user=current_user, course=course,
-                           students=students, instructors=instructors, has_perms=has_perms)
+                           has_perms=has_perms)
 
 
 @app.route('/delete_course/<course_id>')
@@ -303,8 +336,19 @@ def search_users():
     if current_user.is_admin:
         query = request.values.get('q')
         if query:
-            instructors = User.objects(name__icontains=query).only('id', 'name', 'school')
-            return jsonify(instructors)
+            users = User.objects(name__icontains=query).only('id', 'name', 'school')
+            return jsonify(users)
+
+
+@app.route('/tags')
+@login_required
+def search_tags():
+    query = request.values.get('q')
+    if query:
+        tags = Tag.objects(name__icontains=query).only('id', 'name')
+    else:
+        tags = Tag.objects.all().only('id', 'name')
+    return jsonify(tags)
 
 
 @app.route('/logout', methods=['GET'])
@@ -318,14 +362,13 @@ def logout():
 @login_required
 def grade_book():
     user_courses = Course.objects.all()
-    return render_template('scores.html', page='Grade Book', user=current_user, courses=user_courses)
+    return render_template('scores.html', page='Scores', user=current_user, courses=user_courses)
 
 
 @app.route('/lab/<lab_id>', methods=['GET'])
 @login_required
 def take_lab(lab_id):
     lab = Lab.objects(id=lab_id).first()
-    print(lab)
     return render_template('/labs/take-lab.html', user=current_user, lab=lab)
 
 
@@ -343,11 +386,12 @@ def lab_complete():
             engine = ScoringEngine(scoring_type='comparison', answers=modified_answers, key=lab.pages)
             points = engine.calculateScore()
             completion_time = datetime.datetime.now()
-            attempt = LabAttempt(time_submitted=completion_time, answers=[modified_answers], points=points, fk_student=current_user.id)
+            attempt = LabAttempt(time_submitted=completion_time, answers=[modified_answers], points=points,
+                                 fk_student=current_user.id)
             attempt.save()
 
-            return render_template('accounts/lab-complete.html', lab_completion_time=completion_time.strftime("%m/%d/%Y, %H:%M:%S"), points=points, user=current_user)
+            return render_template('accounts/lab-complete.html',
+                                   lab_completion_time=completion_time.strftime("%m/%d/%Y, %H:%M:%S"), points=points,
+                                   user=current_user)
         else:
-            return render_template('unautherized.html')
-    else:
-        return render_template('unautherized.html')
+            return abort(403, description="User is not authenticated.")

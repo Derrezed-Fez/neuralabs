@@ -58,6 +58,14 @@ class Course(db.Document):
     roles = db.ListField(default=['Student'])
     join_date = db.DateTimeField()
 
+    @property
+    def labs(self):
+        return Lab.objects(course=self).all()
+
+    @property
+    def id_string(self):
+        return str(self.id)
+
 
 class Tag(db.Document):
     name = db.StringField(max_length=30)
@@ -66,8 +74,8 @@ class Tag(db.Document):
 class Lab(UserMixin, db.Document):
     meta = {'collection': 'Lab'}
     name = db.StringField(max_length=30)
-    course_id = db.StringField()
-    image = db.BinaryField()
+    default_thumbnail = db.IntField(default=0)
+    custom_thumbnail = db.BinaryField()
     tags = db.ListField(default=[])
     date_created = db.DateTimeField()
     difficulty = db.StringField()
@@ -75,10 +83,23 @@ class Lab(UserMixin, db.Document):
     pages = db.ListField(default=[])
     owner = db.ReferenceField(User)
     course = db.ReferenceField(Course)
+    hidden = db.BooleanField(default=False)
 
     @property
     def total_points(self):
         return sum([page['points'] for page in self.pages])
+
+    @property
+    def thumbnail(self):
+        defaults = {
+            1: '/static/thumbnails/default-1.png',
+            2: '/static/thumbnails/default-2.png',
+            3: '/static/thumbnails/default-3.png',
+            4: '/static/thumbnails/default-4.png',
+        }
+        if self.custom_thumbnail:
+            return self.custom_thumbnail
+        return defaults[self.default_thumbnail]
 
 
 class LabAttempt(UserMixin, db.Document):
