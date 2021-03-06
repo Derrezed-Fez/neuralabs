@@ -78,7 +78,7 @@ class Lab(UserMixin, db.Document):
 
     @property
     def total_points(self):
-        return sum([page['points'] for page in self.pages])
+        return sum([int(page['points']) for page in self.pages])
 
 
 class LabAttempt(UserMixin, db.Document):

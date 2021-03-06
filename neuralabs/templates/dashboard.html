@@ -42,12 +42,7 @@
               {% for lab in labs %}
                   <div class="row small-up-2 medium-up-3 large-up-4">
                       <div class="column">
-                          <li class="accordion-item is-active" data-accordion-item>
-                            <a href="#" class="accordion-title">{{lab.name}}</a>
-                            <div class="accordion-content" data-tab-content>
-                                {% include 'labs/card.html' %}
-                            </div>
-                          </li>
+                        {% include 'labs/card.html' %}
                       </div>
                   </div>
               {% endfor %}

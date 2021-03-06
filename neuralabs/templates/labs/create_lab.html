@@ -43,7 +43,7 @@
             <label>What Course is this lab for?
             <select name="course">
               {% for course in courses %}
-                <option value="{{course.id}}">{{course.title}}</option>
+                <option value="{{course.id}}">{{course.name}}</option>
               {% endfor %}
             </select>
           </div>

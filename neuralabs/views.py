@@ -137,11 +137,16 @@ def create_lab():
         total_page_count = int(request.form['total-page-count'])
         pages = []
         for i in range(1, total_page_count):
+            files = list()
+            for attached_file in request.files.keys():
+                if 'p' + str(i) in attached_file:
+                    files.append(request.files[attached_file].filename)
             page = {
                 'title': request.form[f'title-p{i}'],
                 'details': request.form[f'details-p{i}'],
                 'hash': request.form[f'score_engine_value_{i}'],
-                'points': int(request.form[f'score_engine_points_{i}'])
+                'points': int(request.form[f'score_engine_points_{i}']),
+                'files': files
             }
             pages.append(page)
         lab = Lab(
