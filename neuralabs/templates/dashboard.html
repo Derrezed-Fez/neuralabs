@@ -40,6 +40,7 @@
             <div class="row row-padding small-12">
                 <ul class="accordion" data-accordion role="tablist" data-multi-expand="true">
                     {% for course in courses %}
+                      {% if course.labs %}
                         <li class="accordion-navigation is-active">
                             <a href="#{{ course.id }}" role="tab" class="accordion-title" id="{{ course.id }}-heading" aria-controls="{{ course.id }}">{{ course.name }}</a>
                             <div id="{{ course.id }}" class="accordion-content" role="tabpanel" data-tab-content aria-labelledby="{{ course.id }}-heading">
@@ -52,6 +53,7 @@
                                 </div>
                             </div>
                         </li>
+                      {% endif %}
                     {% endfor %}
                 </ul>
             </div>

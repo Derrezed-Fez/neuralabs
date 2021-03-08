@@ -1,3 +1,11 @@
+global SCORING_SCALE
+SCORING_SCALE = {
+    "1": 25,
+    "2": 50,
+    "3": 75,
+    "4": 100
+}
+
 class ScoringEngine:
     def __init__(self, scoring_type:str, answers:dict, key:list):
         self.scoring_type = scoring_type
@@ -19,3 +27,6 @@ class ScoringEngine:
                 points += int(self.key[key]['points'])
 
         return points
+
+def lookup_points(difficulty:str):
+    return SCORING_SCALE[difficulty]

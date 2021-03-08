@@ -10,11 +10,26 @@
         <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p1">{% if lab %}{{page.details}}{% endif %}</textarea>
       </label>
     </div>
-    <div class="cell">
-      <label>Scoring Engine Hash value&nbsp;
-        <input type="checkbox" id="score_engine_enable_1">
-        <input type="text" placeholder="0xc0ffee" disabled id="score_engine_value_1"/>
-      </label>
+    <label>Scoring Engine Hash value&nbsp;
+      <input type="checkbox" id="score_engine_enable_1">
+    </label>
+    <div id="scoring_engine_1" style="display: none" class="cell">
+        <div class="input-group">
+          <span class="input-group-label">Answer Prompt</span>
+          <input class="input-group-field" placeholder="Input the Hash" type="text" id="score_engine_prompt_1" name="score_engine_prompt_1">
+        </div>
+        <div class="input-group">
+          <span class="input-group-label">Answer and Difficulty</span>
+          <input class="input-group-field" type="text" placeholder="0xc0ffee" id="score_engine_value_1" name="score_engine_value_1">
+          <div class="input-group-field">
+            <select class="input-group-field" name="answer_difficulty_1">
+              <option value="1">Trivial</option>
+              <option value="2">Easy</option>
+              <option value="3">Medium</option>
+              <option value="4">Hard</option>
+            </select>
+          </div>
+        </div>
     </div>
     <div class="cell">
       <div id="files-p1">
@@ -25,9 +40,10 @@
         {% endif %}
       </div>
       <label for="fileUpload1-p1" class="button">Upload External Media</label>
-      <input type="file" id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
+      <input type="file" multiple id="fileUpload1-p1" class="show-for-sr" name="fileUpload1-p1" onchange="displayUploadedFiles(this, 'files-p1');">
       <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
     </div>
+    <input type="hidden" class="total-page-count">
 </div>
 <hr style="border-bottom: 1px dashed #c3c3c3;">
 </section>

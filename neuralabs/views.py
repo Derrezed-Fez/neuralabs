@@ -10,12 +10,17 @@ import base64
 import bson
 from bson.binary import Binary
 import string
-import random
+import random, os
 from flask import abort, jsonify
 import base64
-from scoringEngine import ScoringEngine
+from scoringEngine import ScoringEngine, lookup_points
 from mongoengine.queryset.visitor import Q
+from werkzeug.utils import secure_filename
 
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -92,6 +97,8 @@ def dashboard():
         else:
             user_courses = Course.objects(Q(students__contains=current_user) | Q(instructors__contains=current_user))
         labs = Lab.objects()
+        print(labs)
+        print(user_courses)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return abort(403, description="User must login.")
@@ -143,18 +150,23 @@ def create_lab():
     tags = Tag.objects.all()
 
     if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
+        os.mkdir(os.getcwd() + app.config['UPLOAD_FOLDER'] + '/' + request.form['name'])
         total_page_count = int(request.form.get('total-page-count', 0))
         pages = []
-        for i in range(1, total_page_count):
+        for i in range(1, total_page_count+1):
             files = list()
             for attached_file in request.files.keys():
                 if 'p' + str(i) in attached_file:
-                    files.append(request.files[attached_file].filename)
+                    if attached_file and allowed_file(request.files[attached_file].filename):
+                        filename = secure_filename(request.files[attached_file].filename)
+                        request.files[attached_file].save(os.getcwd() + app.config['UPLOAD_FOLDER'] + '/' + request.form['name'] + '/' + filename)
+                        files.append(request.files[attached_file].filename)
             page = {
                 'title': request.form[f'title-p{i}'],
                 'details': request.form[f'details-p{i}'],
-                'hash': request.form[f'score_engine_value_{i}'],
-                'points': int(request.form[f'score_engine_points_{i}']),
+                'answer_prompt': request.form[f'score_engine_prompt_{i}'],
+                'answer': request.form[f'score_engine_value_{i}'],
+                'points': lookup_points(request.form[f'answer_difficulty_{i}']),
                 'files': files
             }
             pages.append(page)
@@ -176,6 +188,8 @@ def create_lab():
         return redirect('/manage')
 
     courses = Course.objects(instructors__contains=current_user.id)
+    print(tags)
+    print(courses)
     return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses,
                            tags=tags)
 
@@ -191,6 +205,8 @@ def manage_labs():
             labs = labs.filter(course=course)
 
     courses = Course.objects(instructors__contains=current_user.id)
+    print(courses)
+    print(labs)
     return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs, courses=courses,
                            filter=course_filter)
 
@@ -247,6 +263,9 @@ def admin():
     courses = Course.objects.all()
     tags = Tag.objects.all()
     schools = School.objects.all()
+    print(courses)
+    print(tags)
+    print(schools)
 
     return render_template('administration/admin.html', page='Admin', user=current_user, course_form=CourseForm(),
                            courses=courses, tag_form=TagForm(), tags=tags, school_form=SchoolForm(), schools=schools)

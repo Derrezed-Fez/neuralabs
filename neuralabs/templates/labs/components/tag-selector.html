@@ -3,9 +3,11 @@
         <div id="tags"></div>
         <input style="margin-bottom: 0" type="text" id="tag-search" placeholder="Tags" maxlength="30" onmousedown="search_tags(this.value)">
         <div id="search-results" style="display: none;">
-            {% for tag in tags %}
-                <div id="{{ tag.id }}" class="tag-result search-result" onclick="add_tag(this)">#{{ tag.name }}</div>
-            {% endfor %}
+            {% if tags %}
+                {% for tag in tags %}
+                    <div id="{{ tag.id }}" class="tag-result search-result" onclick="add_tag(this)">#{{ tag.name }}</div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
     <script>
