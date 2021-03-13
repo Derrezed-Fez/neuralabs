@@ -17,6 +17,14 @@
             {% include 'form-feedback.html' %}
             <label><i class="fi-torso"></i> Username{{ form.name }}</label>
             <label><i class="fi-mail"></i> Email{{ form.email }}</label>
+            <label style="margin: 0 0 1rem;"><i class="fi-projection-screen"></i> School
+                <select name="setting_school" id="setting_school" style="margin-bottom: 0" onchange="change_setting(this, this.value);">
+                    <option value="None">Hidden</option>
+                    {% for school in schools %}
+                        <option value="{{ school.id }}">{{ school.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
             <label><i class="fi-lock"></i> Password{{ form.password }}</label>
             <label><i class="fi-lock"></i> Confirm Password{{ form.confirm }}</label>
             {{ form.hidden_tag() }}

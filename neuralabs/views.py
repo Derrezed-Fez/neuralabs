@@ -17,19 +17,15 @@ from scoringEngine import ScoringEngine, lookup_points
 from mongoengine.queryset.visitor import Q
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('errors/404_not_found.html'), 404
+    return render_template('errors/404_not_found.html', error=e), 404
 
 
 @app.errorhandler(403)
 def page_unauthorized(e):
-    return render_template('errors/403_unauthorized.html'), 403
+    return render_template('errors/403_unauthorized.html', error=e), 403
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -38,7 +34,7 @@ def register():
     if request.method == 'POST':
         if form.validate_on_submit():
             existing_email = User.objects(email=form.email.data).first()
-            existing_username = User.objects(username=form.name.data).first()
+            existing_username = User.objects(name=form.name.data).first()
             if existing_username:
                 form.errors['username'] = ['Username is already in use.']
             if existing_email:
@@ -50,7 +46,7 @@ def register():
                 new_user.save()
                 login_user(new_user)
                 return redirect(url_for('dashboard'))
-    return render_template('accounts/register.html', page='Register', form=form)
+    return render_template('accounts/register.html', page='Register', form=form, schools=School.objects.all())
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -85,7 +81,7 @@ def change_password():
 @app.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
     form = ResetPasswordForm()
-    return render_template('accounts/reset-password.html', page='Reset Password', form=form)
+    return render_template('accounts/reset_password.html', page='Reset Password', form=form)
 
 
 @app.route('/dashboard')
@@ -95,10 +91,9 @@ def dashboard():
         if current_user.is_admin:
             user_courses = Course.objects.all()
         else:
-            user_courses = Course.objects(Q(students__contains=current_user) | Q(instructors__contains=current_user))
+            user_courses = Course.objects(Q(students__contains=current_user.id) | Q(instructors__contains=current_user.id))
         labs = Lab.objects()
         print(labs)
-        print(user_courses)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return abort(403, description="User must login.")
@@ -143,55 +138,93 @@ def change_setting():
     return app.response_class(response={'status': 'success'}, status=200, mimetype='application/json')
 
 
+def save_pages(lab):
+    image = request.files['lab-photo']
+    if image:
+        lab.update(custom_thumbnail=base64.b64encode(image.read()))
+    file_dir = f"{os.getcwd()}{app.config['UPLOAD_FOLDER']}/{lab.id}"
+    if not os.path.exists(file_dir):
+        os.mkdir(file_dir)
+
+    total_page_count = int(request.form.get('total-page-count', 0))
+    for i in range(1, total_page_count + 1):
+        files = list()
+        for attached_file in request.files.keys():
+            if f'p{i}' in attached_file:
+                if attached_file and request.files[attached_file].filename:
+                    filename = secure_filename(request.files[attached_file].filename)
+                    filepath = f"{os.getcwd()}{app.config['UPLOAD_FOLDER']}/{lab.id}/{filename}"
+                    if not os.path.exists(filepath):
+                        request.files[attached_file].save(filepath)
+                    files.append(filename)
+        lab.pages.append({
+            'page_num': i,
+            'title': request.form[f'title-p{i}'],
+            'details': request.form[f'details-p{i}'],
+            'answer_prompt': request.form[f'score_engine_prompt_{i}'],
+            'answer': request.form[f'score_engine_value_{i}'],
+            'difficulty': request.form[f'answer_difficulty_{i}'],
+            'points': lookup_points(request.form[f'answer_difficulty_{i}']),
+            'files': files
+        })
+        lab.save()
+
+
 @app.route('/create-lab', methods=['GET', 'POST'])
 @login_required
 def create_lab():
+    if not current_user.is_authenticated:
+        return abort(403, description="User must login.")
+
     form = LabForm()
     tags = Tag.objects.all()
+    courses = Course.objects(instructors__contains=current_user.id)
 
-    if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
-        os.mkdir(os.getcwd() + app.config['UPLOAD_FOLDER'] + '/' + request.form['name'])
-        total_page_count = int(request.form.get('total-page-count', 0))
-        pages = []
-        for i in range(1, total_page_count+1):
-            files = list()
-            for attached_file in request.files.keys():
-                if 'p' + str(i) in attached_file:
-                    if attached_file and allowed_file(request.files[attached_file].filename):
-                        filename = secure_filename(request.files[attached_file].filename)
-                        request.files[attached_file].save(os.getcwd() + app.config['UPLOAD_FOLDER'] + '/' + request.form['name'] + '/' + filename)
-                        files.append(request.files[attached_file].filename)
-            page = {
-                'title': request.form[f'title-p{i}'],
-                'details': request.form[f'details-p{i}'],
-                'answer_prompt': request.form[f'score_engine_prompt_{i}'],
-                'answer': request.form[f'score_engine_value_{i}'],
-                'points': lookup_points(request.form[f'answer_difficulty_{i}']),
-                'files': files
-            }
-            pages.append(page)
-
+    if request.method == 'POST' and form.validate_on_submit():
         lab = Lab(
             name=request.form['name'],
             default_thumbnail=request.form['thumbnail'],
             date_created=datetime.datetime.now,
             difficulty=request.form['difficulty'],
             description=request.form['description'],
-            pages=pages,
             owner=current_user.id,
-            course=request.form.get('course', None)
+            course=request.form.get('course', None),
+            pages=[]
         )
         lab.save()
-        if request.files and 'lab-photo' in request.files:
-            image = request.files['lab-photo']
-            lab.update(custom_thumbnail=base64.b64encode(image.read()))
-        return redirect('/manage')
+        save_pages(lab)
 
-    courses = Course.objects(instructors__contains=current_user.id)
-    print(tags)
-    print(courses)
+        return redirect('/manage')
     return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses,
                            tags=tags)
+
+
+@app.route('/edit-lab/<lab_id>', methods=['GET', 'POST'])
+def edit_lab(lab_id):
+    if not current_user.is_authenticated:
+        return abort(403, description="User must login.")
+    lab = Lab.objects.get(id=lab_id)
+    if not lab:
+        return abort(404, description="Lab does not exist.")
+
+    form = LabForm()
+    tags = Tag.objects.all()
+    courses = Course.objects(instructors__contains=current_user.id)
+
+    if request.method == 'POST' and form.validate_on_submit():
+        lab.update(
+            name=request.form['name'],
+            default_thumbnail=request.form['thumbnail'],
+            difficulty=request.form['difficulty'],
+            description=request.form['description'],
+            course=request.form.get('course', None),
+        )
+        lab.save()
+        save_pages(lab)
+
+        return redirect('/manage')
+    return render_template('labs/create_lab.html', page='Create Lab', user=current_user, form=form, courses=courses,
+                           tags=tags, lab=lab)
 
 
 @app.route('/manage', methods=['GET'])
@@ -205,53 +238,8 @@ def manage_labs():
             labs = labs.filter(course=course)
 
     courses = Course.objects(instructors__contains=current_user.id)
-    print(courses)
-    print(labs)
     return render_template('labs/manage.html', page='Manage Labs', user=current_user, labs=labs, courses=courses,
                            filter=course_filter)
-
-
-@app.route('/edit-lab/<lab_id>', methods=['GET', 'POST'])
-def edit_lab(lab_id):
-    form = LabForm()
-
-    if current_user.is_authenticated:
-        lab = Lab.objects(id=lab_id).first()
-        tags = Tag.objects.all()
-        if lab.owner == current_user or current_user.is_admin:
-            if request.method == "POST" and form.validate_on_submit():
-                image = request.files['lab-photo']
-                encoded_image = base64.b64encode(image.read())
-                total_page_count = int(request.form['total-page-count'])
-                pages = []
-                for i in range(1, total_page_count + 2):
-                    file_attachments = list()
-                    for key, value in request.form.items():
-                        if 'fileUpload' in key:
-                            file_attachments.append(value)
-                    page = {
-                        'title': request.form[f'title-p{i}'],
-                        'details': request.form[f'details-p{i}'],
-                        'hash': request.form[f'score_engine_value_{i}'],
-                        'points': int(request.form.get(f'score_engine_points_{i}', 0)),
-                        'files': file_attachments
-                    }
-                    pages.append(page)
-                lab.update(
-                    name=request.form['name'],
-                    default_thumbnail=request.form['thumbnail'],
-                    custom_thumbnail=encoded_image,
-                    date_created=datetime.datetime.now,
-                    difficulty=request.form['difficulty'],
-                    description=request.form['description'],
-                    pages=pages,
-                    owner=current_user.id,
-                    course=request.form.get('course', None)
-                )
-                return redirect('/manage')
-            return render_template('labs/create_lab.html', lab=lab, user=current_user, page='Edit Lab', form=form,
-                                   tags=tags)
-    return abort(403, description="User must login.")
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -263,10 +251,6 @@ def admin():
     courses = Course.objects.all()
     tags = Tag.objects.all()
     schools = School.objects.all()
-    print(courses)
-    print(tags)
-    print(schools)
-
     return render_template('administration/admin.html', page='Admin', user=current_user, course_form=CourseForm(),
                            courses=courses, tag_form=TagForm(), tags=tags, school_form=SchoolForm(), schools=schools)
 
@@ -277,7 +261,7 @@ def create_course():
     form = CourseForm()
     if request.method == 'POST' and form.validate_on_submit() and current_user.is_admin:
         new_course = Course(name=form.name.data)
-        new_course.join_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        new_course.join_code = ''.join(random.choice(string.ascii_uppercase) for _ in range(6))
         new_course.save()
         return redirect(url_for('admin'))
 
@@ -312,7 +296,9 @@ def manage_course(course_id):
     has_perms = current_user.is_admin or current_user in course.instructors
 
     if has_perms and request.values.get('remove'):
-        course.update(pull__students=request.values.get('remove'))
+        user = User.objects(id=request.values.get('remove')).first()
+        if user:
+            course.update(pull__students=user)
         return redirect(url_for('manage_course', course_id=course_id))
 
     if has_perms and request.values.get('select_user'):
@@ -323,11 +309,22 @@ def manage_course(course_id):
         return redirect(url_for('manage_course', course_id=course_id))
 
     if has_perms and request.values.get('remove_instructor'):
-        course.update(pull__instructors=request.values.get('remove_instructor'))
+        user = User.objects(id=request.values.get('remove_instructor')).first()
+        if user:
+            course.update(pull__instructors=user)
         return redirect(url_for('manage_course', course_id=course_id))
 
     return render_template('administration/course.html', page='Course', user=current_user, course=course,
                            has_perms=has_perms)
+
+
+@app.route('/delete_lab/<lab_id>')
+@login_required
+def delete_lab(lab_id):
+    lab = Lab.objects(id=lab_id).first()
+    if current_user.is_admin or lab.owner.id == current_user.id:
+        lab.delete()
+    return redirect('/manage')
 
 
 @app.route('/delete_course/<course_id>')
@@ -360,7 +357,7 @@ def search_users():
     if current_user.is_admin:
         query = request.values.get('q')
         if query:
-            users = User.objects(name__icontains=query).only('id', 'name', 'school')
+            users = User.objects(name__icontains=query).only('id', 'name', 'school')  # School name nonfunctional
             return jsonify(users)
 
 
@@ -393,29 +390,64 @@ def grade_book():
 @login_required
 def take_lab(lab_id):
     lab = Lab.objects(id=lab_id).first()
-    return render_template('/labs/take-lab.html', user=current_user, lab=lab)
+
+    if 'attempt' in request.values:
+        attempt_id = request.values.get('attempt')
+        if attempt_id == 'new':
+            current_attempt = LabAttempt(lab=lab, user=current_user.id, time_started=datetime.datetime.now)
+            current_attempt.save()
+            return redirect(f"/lab/{lab.id}/{current_attempt.id}")
+
+    attempts = LabAttempt.objects(lab=lab, user=current_user.id)
+    current_attempt = LabAttempt.objects(lab=lab, time_submitted=None, user=current_user.id).first()
+    return render_template('labs/start_lab.html', user=current_user, lab=lab, attempts=attempts, page=lab.name,
+                           current_attempt=current_attempt)
 
 
-@app.route('/lab-complete', methods=['POST'])
+@app.route('/lab/<lab_id>/<attempt_id>', methods=['GET', 'POST'])
 @login_required
-def lab_complete():
-    if request.method == 'POST':
-        if current_user.is_authenticated:
-            lab = Lab.objects(id=request.form.get('lab_id')).first()
-            modified_answers = dict()
-            counter = 1
-            for key, value in request.form.items():
-                if key != 'lab_id':
-                    modified_answers['page' + str(counter)] = value
-            engine = ScoringEngine(scoring_type='comparison', answers=modified_answers, key=lab.pages)
-            points = engine.calculateScore()
-            completion_time = datetime.datetime.now()
-            attempt = LabAttempt(time_submitted=completion_time, answers=[modified_answers], points=points,
-                                 fk_student=current_user.id)
-            attempt.save()
+def continue_lab(lab_id, attempt_id):
+    lab = Lab.objects(id=lab_id).first()
+    current_attempt = LabAttempt.objects(id=attempt_id, user=current_user.id).first()
+    if not current_attempt or not lab:
+        return abort(404, description="Lab Attempt Not Found.")
+    if current_attempt.time_submitted:  # Lab has already been submitted
+        return redirect(f'/results/{lab.id}/{current_attempt.id}')
 
-            return render_template('accounts/lab-complete.html',
-                                   lab_completion_time=completion_time.strftime("%m/%d/%Y, %H:%M:%S"), points=points,
-                                   user=current_user)
-        else:
-            return abort(403, description="User is not authenticated.")
+    page_number = int(request.values.get('page', current_attempt.current_page))
+    if page_number <= 0 or page_number > len(lab.pages):
+        return abort(404, description="Page Not Found.")
+
+    if request.method == 'POST':
+        # Save page results here
+        #
+        #
+
+        if 'Next Page' in request.form['goto_page']:
+            page_number += 1
+        if 'Previous Page' in request.form['goto_page']:
+            page_number -= 1
+        if 'Submit Lab' in request.form['goto_page']:
+            current_attempt.time_submitted = datetime.datetime.now
+            current_attempt.save()
+            return redirect(f'/results/{lab.id}/{current_attempt.id}')
+
+        current_attempt.current_page = page_number
+        current_attempt.save()
+        return redirect(f'/lab/{lab.id}/{current_attempt.id}?page={page_number}')
+
+    return render_template('labs/take_lab.html', user=current_user, lab=lab, current_attempt=current_attempt,
+                           page=lab.name, lab_page=lab.pages[page_number - 1], page_number=page_number,
+                           total_pages=len(lab.pages))
+
+
+@app.route('/results/<lab_id>/<attempt_id>', methods=['GET'])
+@login_required
+def lab_complete(lab_id, attempt_id):
+    lab = Lab.objects(id=lab_id).first()
+    attempt = LabAttempt.objects(id=attempt_id, user=current_user.id).first()
+    if not attempt or not lab:
+        return abort(404, description="Lab Attempt Not Found.")
+
+    # Score attempt
+    return render_template('labs/lab_complete.html', attempt=attempt, user=current_user, points=5)

@@ -52,10 +52,10 @@
                         </tr>
                         <tbody>
                             {% for course in enrolled_courses %}
-                                <tr><td>{{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
+                                <tr><td><a href='/course/{{ course.id }}'>{{ course.name }}</a> <a style="float:right; color:red" href="">Leave</a></td></tr>
                             {% endfor %}
                             {% for course in instructor_courses %}
-                                <tr><td>[Instructor] {{ course.name }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
+                               <tr><td><a href='/course/{{ course.id }}'>[Instructor] {{ course.name }}</a> <a style="float:right; color:red" href="">Leave</a></td></tr>
                             {% endfor %}
                         </tbody>
                     </thead>
@@ -82,7 +82,7 @@
                             <td>Display School:</td>
                             <td>
                                 <select name="setting_school" id="setting_school" style="margin-bottom: 0" onchange="change_setting(this, this.value);">
-                                    <option value="None">None</option>
+                                    <option value="None">Hidden</option>
                                     {% for school in schools %}
                                         <option {% if user.school == school %}selected{% endif %} value="{{ school.id }}">{{ school.name }}</option>
                                     {% endfor %}

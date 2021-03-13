@@ -1,0 +1,40 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="callout secondary">
+  <div class="row column">
+    <h1>{{lab.name}}</h1>
+  </div>
+</div>
+<div class='row' style="padding: 10px">
+    <form action="/lab/{{ lab.id }}/{{ current_attempt.id }}?page={{ page_number }}" method="POST" enctype=multipart/form-data>
+        <input type='hidden' name='lab_id' value='{{lab.id}}'/>
+        <hr style="margin: 5px 0 5px 0;">
+        <h4 style="text-align: center"><span style="float: left">Page {{page_number}}:</span>{{ lab_page.title }}</h4>
+        <hr style="margin: 5px 0 20px 0;">
+            <div class="row">
+                <div id="instructions" class="column small-6">
+                    <b>Assignment Details</b>
+                    <p>{{ lab_page.details }}</p>
+                    {% for file in lab_page.files %}
+
+                    {% endfor %}
+                </div>
+                <div id="answers" class="column small-6">
+                    <p><b>Question: </b>{{ lab_page.answer_prompt }}</p>
+                    <input placeholder="Answer" type="text" id="score_engine_value_1" name="score_engine_value_1"/>
+                    <p>This objective is worth {{lab_page.points}} pts.</p>
+                </div>
+            </div>
+        <center>
+            {% if page_number > 1 %}
+                <input class="button" style="background-color:green; margin-top: 50px" type="submit" name="goto_page" value="< Previous Page"/>
+            {% endif %}
+            {% if page_number == total_pages %}
+                <input class="button" style="background-color:green; margin-top: 50px" type="submit" name="goto_page" value="Submit Lab"/>
+            {% else %}
+                <input class="button" style="background-color:green; margin-top: 50px" type="submit" name="goto_page" value="Next Page >"/>
+            {% endif %}
+        </center>
+    </form>
+</div>
+{% endblock %}

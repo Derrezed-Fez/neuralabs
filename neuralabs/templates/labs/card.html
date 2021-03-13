@@ -6,4 +6,13 @@
         <a href="/course/{{ lab.course.id }}" class="card-course">{{ lab.course.name }}</a>
         <p class="card-stats" title="Lab Difficulty Level">{{ lab.difficulty }} <i class="fi-puzzle"></i></p>
     </div>
+    {% if request.path == '/manage' %}
+        <a class="button" style="background-color: red;" data-open="confirm-delete-{{ lab.id }}">Delete</a>
+        <div class="reveal" id="confirm-delete-{{ lab.id }}" data-reveal>
+        <p class="lead">Are you sure you want to delete:</p>
+        <p>{{ lab.name }} ({{ lab.pages|length }} pages)</p>
+        <a href="/delete_lab/{{ lab.id }}" class="button small">Delete</a>
+        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+        </div>
+    {% endif %}
 </div>

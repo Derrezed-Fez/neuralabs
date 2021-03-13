@@ -39,6 +39,7 @@
             <hr>
             <div class="row row-padding small-12">
                 <ul class="accordion" data-accordion role="tablist" data-multi-expand="true">
+                {% if courses %}
                     {% for course in courses %}
                       {% if course.labs %}
                         <li class="accordion-navigation is-active">
@@ -55,6 +56,9 @@
                         </li>
                       {% endif %}
                     {% endfor %}
+                {% else %}
+                    <center><p>No current courses. <a href="/profile">Join a new course?</a></p></center>
+                {% endif %}
                 </ul>
             </div>
     <script src="../static/dashboard.js"></script>

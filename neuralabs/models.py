@@ -8,6 +8,7 @@ def load_user(user_id):
 
 
 class School(db.Document):
+    meta = {'collection': 'School'}
     name = db.StringField()
 
 
@@ -68,6 +69,7 @@ class Course(db.Document):
 
 
 class Tag(db.Document):
+    meta = {'collection': 'Tag'}
     name = db.StringField(max_length=30)
 
 
@@ -101,14 +103,20 @@ class Lab(UserMixin, db.Document):
             return self.custom_thumbnail
         return defaults[self.default_thumbnail]
 
+    @property
+    def questions(self):
+        return [page for page in self.pages if page['answer']]
+
 
 class LabAttempt(UserMixin, db.Document):
     meta = {'collection': 'LabAttempt'}
+    lab = db.ReferenceField(Lab)
+    user = db.ReferenceField(User)
+    current_page = db.IntField(default=1)
+    time_started = db.DateTimeField()
     time_submitted = db.DateTimeField()
     answers = db.ListField(default=[])
     points = db.IntField()
-    student = db.ReferenceField(User)
-    pk_owner = db.ObjectIdField()
 
     @property
     def course(self):

@@ -1,0 +1,39 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="callout secondary">
+  <div class="row column">
+    <h1>{{lab.name}}</h1>
+  </div>
+</div>
+    <div class="row" style="padding: 10px">
+        <hr style="margin: 5px 0 5px 0;">
+        <div class="row" style="text-align: center">
+            <p class="column small-4 nomargin"><b>Pages:</b> {{ lab.pages|length }}</p>
+            <p class="column small-4 nomargin"><b>Points:</b> {{ lab.total_points }}</p>
+            <p class="column small-4 nomargin"><b>Questions:</b> {{ lab.questions|length }}</p>
+        </div>
+        <hr style="margin: 5px 0 20px 0;">
+        {% if attempts %}
+        <table style="margin: 5px 0 20px 0;">
+            <thead>
+                <tbody>
+                  {% for attempt in attempts %}
+                      <tr>
+                          <td><a href="/lab/{{ lab.id }}/{{ attempt.id }}">Attempt #{{ loop.index }}</a></td>
+                            <td>{{ attempt.time_started }}</td>
+                      </tr>
+                  {% endfor %}
+                </tbody>
+            </thead>
+        </table>
+        {% endif %}
+        <p><b>Description:</b></p>
+        {{ lab.description }}
+        {% if current_attempt %}
+            <center><a href="/lab/{{ lab.id }}/{{ current_attempt.id }}" style="margin-top: 50px" class="button">Continue Lab</a></center>
+        {% else %}
+            <center><a href="/lab/{{ lab.id }}?attempt=new" style="margin-top: 50px" class="button">Take Lab</a></center>
+        {% endif %}
+
+    </div>
+{% endblock %}

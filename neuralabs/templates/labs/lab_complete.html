@@ -1,0 +1,14 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="callout secondary">
+  <div class="row column">
+    <h1>Lab Complete</h1>
+  </div>
+</div>
+<hr />
+<div class='row'>
+  <center>
+    <h3><small><strong>Your Attempt at Lab was successfully submitted at {{attempt.time_submitted}}. You got {{points}} points!</strong></small></h3>
+  </center>
+</div>
+{% endblock %}

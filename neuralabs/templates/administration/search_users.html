@@ -12,6 +12,7 @@
                     success: function (data) {
                         $('#search-results').empty();
                         for (user in data) {
+                            console.log(data[user]["school"]);
                             $('#search-results').append('<div id="' + data[user]["_id"]["$oid"] + '" class="user-result search-result">' + data[user]["name"] + '<span id="' + data[user]["_id"]["$oid"] + '" style="margin-left:10px;color: grey;">' + data[user]["school"] + '</span></div>')
                         }
                         $('.user-result').click(function(event) {

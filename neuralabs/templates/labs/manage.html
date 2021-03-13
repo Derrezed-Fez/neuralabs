@@ -13,22 +13,24 @@
         <a href="/create-lab" class="button"><i class="fi-plus"></i> Create New Lab</a>
     </div>
   </div>
-    <div class="row" style="padding: 0 10px 0 10px">
-        <a href="?filter=all" class="button small nomargin {% if filter != 'all' %}hollow{% endif %}">All Courses</a>
-        {% for course in courses %}
-            <a href="?filter={{ course.id }}" class="button small {% if filter != course.id_string %}hollow{% endif %} nomargin">{{ course.name }}</a>
-        {% endfor %}
-    </div>
-  <hr />
-  <div class="row small-up-2 medium-up-3 large-up-4">
-    {% if not labs %}
-    <h5>You have not yet created any Labs</h5>
-    {% endif %}
-    {% for lab in labs %}
-        <div class="column">
-            {% include 'labs/card.html' %}
+<div style="padding: 10px">
+        <div class="row" style="padding: 0 10px 0 10px">
+            <a href="?filter=all" class="button small nomargin {% if filter != 'all' %}hollow{% endif %}">All Courses</a>
+            {% for course in courses %}
+                <a href="?filter={{ course.id }}" class="button small {% if filter != course.id_string %}hollow{% endif %} nomargin">{{ course.name }}</a>
+            {% endfor %}
         </div>
-    {% endfor %}
-  </div>
+      <hr />
+      <div class="row small-up-2 medium-up-3 large-up-4">
+        {% if not labs %}
+        <h5>You have not yet created any Labs</h5>
+        {% endif %}
+        {% for lab in labs %}
+            <div class="column">
+                {% include 'labs/card.html' %}
+            </div>
+        {% endfor %}
+      </div>
+    </div>
 </div>
 {% endblock %}
