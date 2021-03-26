@@ -7,7 +7,9 @@
                   <h1>Welcome to Neuralabs!</h1>
                   <p class="lead">Complete labs to earn points.</p>
                 </div>
-                {% include 'level.html' %}
+                <div class="large-3 column">
+                    {% include 'level.html' %}
+                </div>
             </div>
         </div>
           <div class="row gutter-small">
@@ -57,7 +59,7 @@
                       {% endif %}
                     {% endfor %}
                 {% else %}
-                    <center><p>No current courses. <a href="/profile">Join a new course?</a></p></center>
+                    <center><p>No current courses. <a href="/profile">Join a new course? {{ user.get_score }}</a></p></center>
                 {% endif %}
                 </ul>
             </div>

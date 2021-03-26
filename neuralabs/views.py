@@ -1,21 +1,19 @@
+import base64
+import datetime
+import os
+import random
+import string
+
+from flask import render_template, request, redirect, url_for, send_from_directory, current_app, abort, jsonify
+from flask_login import login_user, login_required, logout_user, current_user
+from mongoengine.queryset.visitor import Q
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
+from neuralabs.__init__ import app
 from neuralabs.forms import *
 from neuralabs.models import *
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask import Flask, render_template, request, redirect, url_for
-from mongoengine.queryset.visitor import Q
-from neuralabs.__init__ import app
-import datetime
-import base64
-import bson
-from bson.binary import Binary
-import string
-import random, os
-from flask import abort, jsonify
-import base64
-from scoringEngine import ScoringEngine, lookup_points
-from mongoengine.queryset.visitor import Q
-from werkzeug.utils import secure_filename
+from scoringEngine import lookup_points
 
 
 @app.errorhandler(404)
@@ -91,9 +89,9 @@ def dashboard():
         if current_user.is_admin:
             user_courses = Course.objects.all()
         else:
-            user_courses = Course.objects(Q(students__contains=current_user.id) | Q(instructors__contains=current_user.id))
+            user_courses = Course.objects(
+                Q(students__contains=current_user.id) | Q(instructors__contains=current_user.id))
         labs = Lab.objects()
-        print(labs)
         return render_template('dashboard.html', page='Dashboard', user=current_user, courses=user_courses, labs=labs)
     else:
         return abort(403, description="User must login.")
@@ -395,6 +393,7 @@ def take_lab(lab_id):
         attempt_id = request.values.get('attempt')
         if attempt_id == 'new':
             current_attempt = LabAttempt(lab=lab, user=current_user.id, time_started=datetime.datetime.now)
+            current_attempt.answers = [''] * len(lab.pages)
             current_attempt.save()
             return redirect(f"/lab/{lab.id}/{current_attempt.id}")
 
@@ -419,9 +418,8 @@ def continue_lab(lab_id, attempt_id):
         return abort(404, description="Page Not Found.")
 
     if request.method == 'POST':
-        # Save page results here
-        #
-        #
+        answer = request.form.get('score_engine_value', '')
+        current_attempt.answers[page_number - 1] = answer
 
         if 'Next Page' in request.form['goto_page']:
             page_number += 1
@@ -429,6 +427,9 @@ def continue_lab(lab_id, attempt_id):
             page_number -= 1
         if 'Submit Lab' in request.form['goto_page']:
             current_attempt.time_submitted = datetime.datetime.now
+            for i, page in enumerate(lab.pages):
+                if page['answer'].strip().lower() == current_attempt.answers[i].strip().lower():
+                    current_attempt.points += page['points']
             current_attempt.save()
             return redirect(f'/results/{lab.id}/{current_attempt.id}')
 
@@ -437,7 +438,9 @@ def continue_lab(lab_id, attempt_id):
         return redirect(f'/lab/{lab.id}/{current_attempt.id}?page={page_number}')
 
     return render_template('labs/take_lab.html', user=current_user, lab=lab, current_attempt=current_attempt,
-                           page=lab.name, lab_page=lab.pages[page_number - 1], page_number=page_number,
+                           page=lab.name, lab_page=lab.pages[page_number - 1],
+                           answer=current_attempt.answers[page_number - 1],
+                           page_number=page_number,
                            total_pages=len(lab.pages))
 
 
@@ -449,5 +452,12 @@ def lab_complete(lab_id, attempt_id):
     if not attempt or not lab:
         return abort(404, description="Lab Attempt Not Found.")
 
-    # Score attempt
-    return render_template('labs/lab_complete.html', attempt=attempt, user=current_user, points=5)
+    return render_template('labs/lab_complete.html', attempt=attempt, user=current_user, lab=lab,
+                           page='Results')
+
+
+@app.route('/external/<lab>/<path:filename>', methods=['GET'])
+@login_required
+def download(filename, lab):
+    external = f'{current_app.root_path}{app.config["UPLOAD_FOLDER"]}/{lab}'
+    return send_from_directory(directory=external, filename=filename)

@@ -20,13 +20,16 @@ class User(UserMixin, db.Document):
     meta = {'collection': 'User'}
     name = db.StringField(max_length=30)
     email = db.StringField(max_length=30)
-    score = db.IntField(default=0)
     password = db.StringField()
     role = db.StringField(max_length=1, choices=roles.keys(), default='U')
     join_date = db.DateTimeField()
     # User Settings:
     private = db.BooleanField(default=False)
     school = db.ReferenceField(School)
+
+    @property
+    def score(self):
+        return LabAttempt.objects(user=self.id).sum('points') + 3000
 
     @property
     def is_admin(self):
@@ -116,7 +119,7 @@ class LabAttempt(UserMixin, db.Document):
     time_started = db.DateTimeField()
     time_submitted = db.DateTimeField()
     answers = db.ListField(default=[])
-    points = db.IntField()
+    points = db.IntField(default=0)
 
     @property
     def course(self):

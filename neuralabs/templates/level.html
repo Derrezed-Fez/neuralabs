@@ -1,7 +1,9 @@
-<div class="large-3 column">
-    <h5 style="margin-bottom: 10px; font-weight: bolder;"><i class="fi-trophy"></i> LEVEL {{ user.level|int }}<span style="float: right; font-size: 10px">{{ user.score|int }}/{{ user.required_points|int }} points</span></h5>
-    <div class="progress" role="progressbar" tabindex="0" aria-valuenow="{{ user.score|int }}" aria-valuemin="0" aria-valuetext="{{ user.score|int }}" aria-valuemax="{{ user.required_points|int }}">
-      <span class="progress-meter" style="width: {{ (user.score / user.required_points) * 100 }}%">
-      </span>
-    </div>
+<h5 style="margin-bottom: 10px; font-weight: bolder;"><i class="fi-trophy"></i> LEVEL {{ user.level|int }}<span style="float: right; font-size: 10px">{{ user.score|int }}/{{ user.required_points|int }} points</span></h5>
+<div class="progress" role="progressbar" tabindex="0" aria-valuenow="{{ user.score|int }}" aria-valuemin="0" aria-valuetext="{{ user.score|int }}" aria-valuemax="{{ user.required_points|int }}">
+  <span id="level-progress" class="progress-meter" style="float: left; width: {{ (user.score / user.required_points) * 100 }}%">
+  </span>
 </div>
+
+<script>
+    document.getElementById("level-progress").animate([{ width: "{{ (user.score / user.required_points) * 50 }}%" }, { width: "{{ (user.score / user.required_points) * 100 }}%"}], {duration: 1000, iterations: 1})
+</script>
