@@ -1,0 +1,41 @@
+<div class="reveal" id="create-school" data-reveal>
+    <form action="/create_school" method="post">
+        <p class="lead">School Name:</p>
+        {{ school_form.name }}
+        <button class="button small" type="submit">Create School</button>
+        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+        {{ school_form.hidden_tag() }}
+    </form>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>
+                All Schools
+            </th>
+            <th>
+                <a data-open="create-school" style="float: right;"><i class="fi-plus"></i> Create New School</a>
+            </th>
+        </tr>
+        <tbody>
+        {% if schools %}
+          {% for school in schools %}
+              <tr>
+                  <td><a href="/school/{{ school.id }}">{{ school.name }}</a></td>
+                  <td>
+                      <a style="float: right; color: red" data-open="confirm-delete-{{ school.id }}">Delete</a>
+                      <div class="reveal" id="confirm-delete-{{ school.id }}" data-reveal>
+                        <p class="lead">Are you sure you want to delete:</p>
+                        <p>{{ school.name }}</p>
+                        <a href="/delete_school/{{ school.id }}" class="button small">Delete</a>
+                        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                  </td>
+              </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td>There are no created schools.</tr>
+        {% endif %}
+        </tbody>
+    </thead>
+</table>

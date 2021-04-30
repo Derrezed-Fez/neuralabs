@@ -1,76 +1,67 @@
-{% extends 'header.html' %}
+{% extends 'navbar.html' %}
 
 {% block content %}
-        <div class="off-canvas-content" data-off-canvas-content>
-          <div class="title-bar hide-for-large">
-            <div class="title-bar-left">
-              <button class="menu-icon" type="button" data-open="my-info"></button>
-              <span class="title-bar-title">Mike Mikerson</span>
+        <div class="callout secondary">
+            <div class="row">
+                <div class="large-9 column">
+                  <h1>Welcome to Neuralabs!</h1>
+                  <p class="lead">Complete labs to earn points.</p>
+                </div>
+                <div class="large-3 column">
+                    {% include 'level.html' %}
+                </div>
             </div>
-          </div>
-          <div class="callout secondary">
-            <div class="row column">
-              <h1>Welcome back to Neuralabs!</h1>
-              <p class="lead">Here's how you rank, {{name}}.</p>
-            </div>
-          </div>
-          <div class="row">
-            <canvas id="stats" style="width: 500px; height: 500px"></canvas>
-          </div>
-          <hr />
-          <div class="row small-up-2 medium-up-3 large-up-4">
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-            <div class="column">
-              <img class="thumbnail" src="https://placehold.it/550x550">
-              <h5>Test Lab</h5>
-            </div>
-          </div>
         </div>
-
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+          <div class="row gutter-small">
+             <div class="large-6 column">
+                  <div class="chart">
+                    <h5>Skill Distribution</h5>
+                    <div><canvas id="radar"></canvas></div>
+                  </div>
+             </div>
+            <div class="large-6 column">
+                <div class="chart">
+                    <h5>Grade Performance</h5>
+                    <div><canvas id="bar"></canvas></div>
+                </div>
+            </div>
+          </div>
+          <hr>
+            <ul class="stats-list">
+              <li>
+                5 <span class="stats-list-label">Completed</span>
+              </li>
+              <li class="stats-list-positive">
+                3 <span class="stats-list-label">Upcoming</span>
+              </li>
+              <li class="stats-list-negative">
+                2 <span class="stats-list-label">Missing</span>
+              </li>
+            </ul>
+            <hr>
+            <div class="row row-padding small-12">
+                <ul class="accordion" data-accordion role="tablist" data-multi-expand="true">
+                {% if courses %}
+                    {% for course in courses %}
+                      {% if course.labs %}
+                        <li class="accordion-navigation is-active">
+                            <a href="#{{ course.id }}" role="tab" class="accordion-title" id="{{ course.id }}-heading" aria-controls="{{ course.id }}">{{ course.name }}</a>
+                            <div id="{{ course.id }}" class="accordion-content" role="tabpanel" data-tab-content aria-labelledby="{{ course.id }}-heading">
+                                <div class="row small-up-2 medium-up-3 large-up-4 collapsed">
+                                    {% for lab in course.labs %}
+                                        <div class="column">
+                                            {% include 'labs/card.html' %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <center><p>No current courses. <a href="/profile">Join a new course? {{ user.get_score }}</a></p></center>
+                {% endif %}
+                </ul>
+            </div>
     <script src="../static/dashboard.js"></script>
   {% endblock %}

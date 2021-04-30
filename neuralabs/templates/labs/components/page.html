@@ -1,0 +1,49 @@
+<section id="page_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" data-magellan-target="page_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+<div>
+    <div class="cell">
+      <label class="title-label">Page {% if page_num %}{{ page_num }}{% else %}$page_num{% endif %} Title
+        <input type="text" placeholder="Pre-Lab Setup" name="title-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" value="{% if page_num %}{{page.title}}{% endif %}">
+      </label>
+    </div>
+    <div class="cell">
+      <label>Assignment Details
+        <textarea style="height:100px;" placeholder="Step 1: boot up your VM..." name="details-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">{% if page_num %}{{page.details}}{% endif %}</textarea>
+      </label>
+    </div>
+    <label>Ask a question
+      <input type="checkbox" id="score_engine_enable_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+    </label>
+    <div id="scoring_engine_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" style="display: none" class="cell">
+        <div class="input-group">
+          <span class="input-group-label">Question</span>
+          <input class="input-group-field" placeholder="Input the Hash" type="text" id="score_engine_prompt_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" name="score_engine_prompt_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+        </div>
+        <div class="input-group">
+          <span class="input-group-label">Answer</span>
+          <input class="input-group-field" type="text" placeholder="0xc0ffee" id="score_engine_value_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" name="score_engine_value_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+          <div class="input-group-field">
+            <select class="input-group-field" name="answer_difficulty_{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+              <option value="1" {% if page and page.difficulty == '1' %}selected{% endif %}>Trivial</option>
+              <option value="2" {% if (page and page.difficulty == '2') or not lab %}selected{% endif %}>Easy</option>
+              <option value="3" {% if page and page.difficulty == '3' %}selected{% endif %}>Medium</option>
+              <option value="4" {% if page and page.difficulty == '4' %}selected{% endif %}>Hard</option>
+            </select>
+          </div>
+        </div>
+    </div>
+    <div class="cell">
+      <div id="files-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}">
+        {% if lab %}
+            {% for file in page.files %}
+              {{file}}
+            {% endfor %}
+        {% endif %}
+      </div>
+      <label for="fileUpload1-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" class="button">Upload External Media</label>
+      <input type="file" multiple id="fileUpload1-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" class="show-for-sr" name="fileUpload1-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}" onchange="displayUploadedFiles(this, 'files-p{% if page_num %}{{ page_num }}{% else %}$page_num{% endif %}');">
+      <input class="button" style="background-color:red;" onclick ="removeLabPage(event);" value="Remove Page"/>
+    </div>
+    <input type="hidden" class="total-page-count">
+</div>
+<hr style="border-bottom: 1px dashed #c3c3c3;">
+</section>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+      {% include 'head.html' %}
+    <title>Neuralabs | {{ page }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  </head>
+  <body onload="$(document).foundation();">
+  <div class="off-canvas-wrapper">
+  <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+    <div class="off-canvas position-left reveal-for-large" id="offCanvasLeft" data-off-canvas data-transition="push">
+        <div id="sidenav">
+        <a href="/" style="color: black">
+            <img style="height: 100px;" src="https://logoipsum.com/logo/logo-16.svg">
+            <h5>Neuralabs</h5>
+        </a>
+            <div id="sidenav-buttons">
+                {% if user.is_admin %}
+                    <a href="/admin"><i class="fi-lock"></i> Admin</a>
+                    <hr>
+                {% endif %}
+                <a href="/dashboard"><i class="fi-layout"></i> Dashboard</a>
+                <hr>
+                <a href="/scores"><i class="fi-book"></i> Leaderboard</a>
+                <hr>
+                <a href="/manage"><i class="fi-wrench"></i> Lab Creator</a>
+                <hr>
+                <a href="/profile"><i class="fi-torso"></i> My Profile</a>
+                <hr>
+                <a href="/logout"><i class="fi-arrow-left"></i> Logout</a>
+                <hr>
+            </div>
+        </div>
+    </div>
+    <div class="off-canvas-content" data-off-canvas-content>
+        <div class="title-bar hide-for-large">
+            <div class="title-bar-left">
+              <button class="menu-icon" type="button" data-open="offCanvasLeft"></button>
+              <span class="title-bar-title">Neuralabs</span>
+          </div>
+      </div>
+        {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+  </body>
+<script>
+    $(document).foundation();
+</script>
+</html>
