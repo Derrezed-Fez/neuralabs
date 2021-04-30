@@ -5,37 +5,31 @@
       <title>Neuralabs | Register</title>
   </head>
   <body>
-
-
-    <!-- Start Top Bar -->
-    <div class="top-bar">
-      <div class="row">
-        <center>
-          <h3>Register for an Account</h3>
-        </center>
-      </div>
-    </div>
-    <!-- End Top Bar -->
-    <br>
-    <!-- You can now combine a row and column if you just need a 12 column row -->
-    <center>
-      <form action="/register" method="post">
-          {% include 'form-feedback.html' %}
-        <p>Username (public)</p>
-        <div style="width: 30%;">{{ form.name }}</div>
-        <p>Email</p>
-        <div style="width: 30%;">{{ form.email }}</div>
-        <p>Password</p>
-        <div style="width: 30%">{{ form.password }}</div>
-        <p>Confirm Password</p>
-        <div style="width: 30%">{{ form.confirm }}</div>
-
-        {{ form.hidden_tag() }}
+        <div class="callout secondary" style="padding: 0">
+            <a href="/" style="color: white; display: flex; align-items: center">
+                <img style="height: 50px" src="https://logoipsum.com/logo/logo-16.svg">
+                <h5 class="nomargin" style="display: inline-block">Neuralabs</h5>
+            </a>
+        </div>
         <br>
-        <br>
-        <input class="button" type="submit" value="Submit">
-      </form>
-      <a href="/">I already have an account</a>
-    </center>
+        <form method="post" action="/register" class="account-form">
+            <h4 class="text-center">Register for an Account</h4>
+            {% include 'form-feedback.html' %}
+            <label><i class="fi-torso"></i> Username{{ form.name }}</label>
+            <label><i class="fi-mail"></i> Email{{ form.email }}</label>
+            <label style="margin: 0 0 1rem;"><i class="fi-projection-screen"></i> School
+                <select name="setting_school" id="setting_school" style="margin-bottom: 0" onchange="change_setting(this, this.value);">
+                    <option value="None">Hidden</option>
+                    {% for school in schools %}
+                        <option value="{{ school.id }}">{{ school.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label><i class="fi-lock"></i> Password{{ form.password }}</label>
+            <label><i class="fi-lock"></i> Confirm Password{{ form.confirm }}</label>
+            {{ form.hidden_tag() }}
+            <p><input type="submit" class="button expanded" value="Sign Up"></p>
+            <p class="text-center">Already have an account? <a href="/">Login In</a></p>
+        </form>
   </body>
 </html>

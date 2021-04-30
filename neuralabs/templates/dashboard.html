@@ -4,10 +4,12 @@
         <div class="callout secondary">
             <div class="row">
                 <div class="large-9 column">
-                  <h1>Welcome to Neurolabs!</h1>
+                  <h1>Welcome to Neuralabs!</h1>
                   <p class="lead">Complete labs to earn points.</p>
                 </div>
-                {% include 'level.html' %}
+                <div class="large-3 column">
+                    {% include 'level.html' %}
+                </div>
             </div>
         </div>
           <div class="row gutter-small">
@@ -37,13 +39,29 @@
               </li>
             </ul>
             <hr>
-          <div class="row small-up-2 medium-up-3 large-up-4">
-            {% for lab in labs %}
-                <div class="column">
-                    {% include 'card-lab.html' %}
-                </div>
-            {% endfor %}
-          </div>
-        </div>
+            <div class="row row-padding small-12">
+                <ul class="accordion" data-accordion role="tablist" data-multi-expand="true">
+                {% if courses %}
+                    {% for course in courses %}
+                      {% if course.labs %}
+                        <li class="accordion-navigation is-active">
+                            <a href="#{{ course.id }}" role="tab" class="accordion-title" id="{{ course.id }}-heading" aria-controls="{{ course.id }}">{{ course.name }}</a>
+                            <div id="{{ course.id }}" class="accordion-content" role="tabpanel" data-tab-content aria-labelledby="{{ course.id }}-heading">
+                                <div class="row small-up-2 medium-up-3 large-up-4 collapsed">
+                                    {% for lab in course.labs %}
+                                        <div class="column">
+                                            {% include 'labs/card.html' %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <center><p>No current courses. <a href="/profile">Join a new course? {{ user.get_score }}</a></p></center>
+                {% endif %}
+                </ul>
+            </div>
     <script src="../static/dashboard.js"></script>
   {% endblock %}

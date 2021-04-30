@@ -1,0 +1,41 @@
+<div class="reveal" id="create-tag" data-reveal>
+    <form action="/create_tag" method="post">
+        <p class="lead">Tag Name:</p>
+        {{ course_form.name }}
+        <button class="button small" type="submit">Create Tag</button>
+        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+        {{ course_form.hidden_tag() }}
+    </form>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>
+                All Tags
+            </th>
+            <th>
+                <a data-open="create-tag" style="float: right;"><i class="fi-plus"></i> Create New Tag</a>
+            </th>
+        </tr>
+        <tbody>
+        {% if tags %}
+          {% for tag in tags %}
+              <tr>
+                  <td><a href="/tags/{{ tag.id }}">{{ tag.name }}</a></td>
+                  <td>
+                      <a style="float: right; color: red" data-open="confirm-delete-{{ tag.id }}">Delete</a>
+                      <div class="reveal" id="confirm-delete-{{ tag.id }}" data-reveal>
+                        <p class="lead">Are you sure you want to delete:</p>
+                        <p>{{ tag.name }}</p>
+                        <a href="/delete_tag/{{ tag.id }}" class="button small">Delete</a>
+                        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                  </td>
+              </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td>There are no created tags.</tr>
+        {% endif %}
+        </tbody>
+    </thead>
+</table>

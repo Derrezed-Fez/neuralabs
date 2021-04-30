@@ -4,44 +4,16 @@
     <div class="callout secondary" style="background: black">
         <div class="row column">
             <h1>Administration Console</h1>
-            <button class="button" onclick="location.href='/create'">Create New Instructor</button>
+            <a href="/create" class="button">Create New Instructor</a>
         </div>
     </div>
     <br>
-    <div style="width: 80%; margin: auto;">
-            <div class="reveal" id="create-course" data-reveal>
-                <form action="" method="post">
-                    {% include 'form-feedback.html' %}
-                    <p class="lead">Course Title:</p>
-                    {{ form.title }}
-                    <button class="button small" type="submit">Create Course</button>
-                    <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span>
-                    </button>
-                    {{ form.hidden_tag() }}
-                </form>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            All Courses
-                        </th>
-                        <th>
-                            <a data-open="create-course" style="float: right;"><i class="fi-plus"></i> Create New Course</a>
-                        </th>
-                    </tr>
-                    <tbody>
-                    {% for course in courses %}
-                        <tr>
-                            <td>{{ course.title }}</td>
-                            <td>
-                                <span style="font-weight: 600">[{{ course.students|length }} students]</span>
-                                <a style="float: right" href="/course/{{ course.id }}">Manage</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </thead>
-            </table>
+    <div style="margin: auto;">
+    <div class="row collapse">{% include 'administration/table_courses.html' %}</div>
+    <div class="row collapse">
+        <div class="column large-6">{% include 'administration/table_tags.html' %}</div>
+        <div class="column large-6">{% include 'administration/table_schools.html' %}</div>
     </div>
+    </div>
+
 {% endblock %}

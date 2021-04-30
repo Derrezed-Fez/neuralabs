@@ -1,0 +1,22 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="callout secondary">
+  <div class="row column">
+    <h1>Lab Complete</h1>
+  </div>
+</div>
+<hr />
+<div class='row'>
+    <h3>
+        <strong>Your lab attempt was successfully submitted at {{attempt.time_submitted.strftime("%m/%d/%Y %H:%M:%S")}}</strong>
+    </h3>
+    <div style="margin-top: 50px">
+      {% include 'level.html' %}
+    </div>
+    <h3 id="final-score">You scored +{{ attempt.points }} points!</h3>
+    <center><a href="/lab/{{ lab.id }}?attempt=new" style="margin-top: 50px" class="button">Retake Lab</a></center>
+    <hr>
+    <h3>Your Lab Ranking:</h3>
+    {% include 'leaderboard.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+<label>Lab Difficulty
+<select name="difficulty">
+  <option value="Easy" {% if lab and lab.difficulty == 'Easy' %} selected {% endif %}>Easy</option>
+  <option value="Medium" {% if lab and lab.difficulty == 'Medium' %} selected {% endif %}>Medium</option>
+  <option value="Hard" {% if lab and lab.difficulty == 'Hard' %} selected {% endif %}>Hard</option>
+  <option value="Impossible" {% if lab and lab.difficulty == 'Impossible' %} selected {% endif %}>Impossible</option>
+</select>
+</label>

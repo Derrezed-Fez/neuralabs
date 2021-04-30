@@ -21,44 +21,89 @@
             <a class="columns small-2 button small"><i class="fi-pencil"></i> Edit Profile</a>
         </div>
         <br>
-        <ul class="tabs" data-tabs id="example-tabs">
-          <li class="tabs-title is-active"><a data-tabs-target="about" href="#about" aria-selected="true">About</a></li>
-          <li class="tabs-title"><a data-tabs-target="about" href="#friends">Friends</a></li>
-            <li class="tabs-title"><a data-tabs-target="about" href="#settings">Settings</a></li>
+        <ul class="tabs" data-tabs id="profile-tabs">
+            <li class="tabs-title is-active"><a data-tabs-target="about" href="#about" aria-selected="true">About</a></li>
+            <li class="tabs-title"><a data-tabs-target="friends" href="#friends">Friends</a></li>
+            <li class="tabs-title"><a data-tabs-target="settings" href="#settings">Settings</a></li>
         </ul>
         <br>
-        <div class="row gutter-small tabs-panel is-active" id="about">
-        {% include 'form-feedback.html' %}
-            <table class="columns large-5">
-                <thead>
-                    <tr>
-                      <th width="200">Account Information</th>
-                    </tr>
-                    <tbody>
-                        <tr><td><label style="color: gray"><i class="fi-projection-screen"></i> School: </label> Eastern Michigan University</td></tr>
-                        <tr><td><label style="color: gray"><i class="fi-mail"></i> Email: </label> {{ user.email }}</td></tr>
-                        <tr><td><label style="color: gray"><i class="fi-calendar"></i> Joined on: </label>{{ user.join_date }}</td></tr>
-                    </tbody>
-                </thead>
-            </table>
-            <table class="columns large-6 unstriped">
-                <thead>
-                    <tr>
-                        <th>
-                            Enrolled Courses
-                            <a data-open="join-course" style="float: right;"><i class="fi-plus"></i> Join Course</a>
-                        </th>
-                    </tr>
-                    <tbody>
-                        {% for course in enrolled_courses %}
-                            <tr><td>{{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
-                        {% endfor %}
-                        {% for course in instructor_courses %}
-                            <tr><td>[Instructor] {{ course.title }} <a href='/course/{{ course.id }}' style="float:right">View</a></td></tr>
-                        {% endfor %}
-                    </tbody>
-                </thead>
-            </table>
+        <div class="tabs-content" data-tabs-content="profile-tabs" style="border: none">
+            <div class="row gutter-small tabs-panel is-active" id="about">
+                {% include 'form-feedback.html' %}
+                <table class="columns large-5">
+                    <thead>
+                        <tr>
+                          <th width="200">Account Information</th>
+                        </tr>
+                        <tbody>
+                            {% if user.school %}<tr><td><label style="color: gray"><i class="fi-projection-screen"></i> School: </label>{{ user.school.name }}</td></tr>{% endif %}
+                            <tr><td><label style="color: gray"><i class="fi-mail"></i> Email: </label> {{ user.email }}</td></tr>
+                            <tr><td><label style="color: gray"><i class="fi-calendar"></i> Joined on: </label>{{ user.join_date }}</td></tr>
+                        </tbody>
+                    </thead>
+                </table>
+                <table class="columns large-6 unstriped">
+                    <thead>
+                        <tr>
+                            <th>
+                                Enrolled Courses
+                                <a data-open="join-course" style="float: right;"><i class="fi-plus"></i> Join Course</a>
+                            </th>
+                        </tr>
+                        <tbody>
+                            {% for course in enrolled_courses %}
+                                <tr><td><a href='/course/{{ course.id }}'>{{ course.name }}</a> <a style="float:right; color:red" href="">Leave</a></td></tr>
+                            {% endfor %}
+                            {% for course in instructor_courses %}
+                               <tr><td><a href='/course/{{ course.id }}'>[Instructor] {{ course.name }}</a> <a style="float:right; color:red" href="">Leave</a></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </thead>
+                </table>
+            </div>
+            <div class="tabs-panel" id="friends">
+            </div>
+            <div class="tabs-panel" id="settings">
+                <div class="row">
+                    <table class="column large-8 unstriped">
+                        <tr>
+                            <td>Private Profile:</td>
+                            <td>
+                                <div class="switch" style="margin-bottom: 0">
+                                    <input class="switch-input" id="setting_private" type="checkbox" name="setting_private" onchange="change_setting(this, this.checked);" {% if user.private %}checked{% endif %}>
+                                    <label class="switch-paddle" for="setting_private">
+                                    <span class="show-for-sr">Private Profile</span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>Keep your points and lab scores private. Profile will not show up in leaderboards.</td>
+                        </tr>
+                        <tr>
+                            <td>Display School:</td>
+                            <td>
+                                <select name="setting_school" id="setting_school" style="margin-bottom: 0" onchange="change_setting(this, this.value);">
+                                    <option value="None">Hidden</option>
+                                    {% for school in schools %}
+                                        <option {% if user.school == school %}selected{% endif %} value="{{ school.id }}">{{ school.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                Add your college or university to your public profile.
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+    <script>
+        function change_setting(element, value) {
+            $.ajax({
+                type: "post",
+                url: "/change_setting",
+                data: {setting: element.name, value: value},
+            });
+        }
+    </script>
 {% endblock %}

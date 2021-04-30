@@ -4,34 +4,23 @@
       {% include 'head.html' %}
       <title>Neuralabs | Login</title>
   </head>
-  <body>
-
-
-    <!-- Start Top Bar -->
-    <div class="top-bar">
-      <div class="row">
-        <center>
-          <h3>Login to Neuralabs</h3>
-        </center>
-      </div>
-    </div>
-    <!-- End Top Bar -->
-    <br>
-    <!-- You can now combine a row and column if you just need a 12 column row -->
-    <center>
-      <form action="" method="post">
+    <body>
+        <div class="callout secondary" style="padding: 0">
+            <a href="/" style="color: white; display: flex; align-items: center">
+                <img style="height: 50px" src="https://logoipsum.com/logo/logo-16.svg">
+                <h5 class="nomargin" style="display: inline-block">Neuralabs</h5>
+            </a>
+        </div>
+        <br>
+        <form method="post" class="account-form">
+            <h4 class="text-center">Login to Neralabs</h4>
             {% include 'form-feedback.html' %}
-            <p>Email</p>
-            <div style="width: 30%;">{{ form.email }}</div>
-            <p>Password</p>
-            <div style="width: 30%;">{{ form.password }}</div>
+            <label><i class="fi-mail"></i> Email{{ form.email }}</label>
+            <label><i class="fi-lock"></i> Password{{ form.password }}</label>
             {{ form.hidden_tag() }}
-            <br>
-            <br>
-            <input class="button" type="submit" value="Login">
+            <p class="text-right"><a href="change-password">Forgot your password?</a></p>
+            <p><input type="submit" class="button expanded" value="Log in"></p>
+            <p class="text-center">New to Neurolabs? <a href="register">Sign Up</a></p>
         </form>
-        <a href="change-password">Forgot Password</a><br>
-        <a href="register">I need to register for an account</a>
-    </center>
-  </body>
+    </body>
 </html>

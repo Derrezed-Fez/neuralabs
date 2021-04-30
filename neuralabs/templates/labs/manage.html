@@ -1,0 +1,36 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="off-canvas-content" data-off-canvas-content>
+  <div class="title-bar hide-for-large">
+    <div class="title-bar-left">
+      <button class="menu-icon" type="button" data-open="my-info"></button>
+      <span class="title-bar-title">{{name}}</span>
+    </div>
+  </div>
+  <div class="callout secondary">
+    <div class="row column">
+      <h1>Lab Management Console</h1>
+        <a href="/create-lab" class="button"><i class="fi-plus"></i> Create New Lab</a>
+    </div>
+  </div>
+<div style="padding: 10px">
+        <div class="row" style="padding: 0 10px 0 10px">
+            <a href="?filter=all" class="button small nomargin {% if filter != 'all' %}hollow{% endif %}">All Courses</a>
+            {% for course in courses %}
+                <a href="?filter={{ course.id }}" class="button small {% if filter != course.id_string %}hollow{% endif %} nomargin">{{ course.name }}</a>
+            {% endfor %}
+        </div>
+      <hr />
+      <div class="row small-up-2 medium-up-3 large-up-4">
+        {% if not labs %}
+        <h5>You have not yet created any Labs</h5>
+        {% endif %}
+        {% for lab in labs %}
+            <div class="column">
+                {% include 'labs/card.html' %}
+            </div>
+        {% endfor %}
+      </div>
+    </div>
+</div>
+{% endblock %}

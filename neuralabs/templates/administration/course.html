@@ -3,14 +3,14 @@
 {% block content %}
     <div class="callout secondary">
         <div class="row column">
-            <h1>{{ course.title }}</h1>
+            <h1>{{ course.name }}</h1>
             <p class="lead"><i class="fi-torso"></i> {{ course.students|length }} student(s) - <i class="fi-torso-business"></i> {{ course.instructors|length }} instructor(s)</p>
             {% if has_perms %}<a class="button" href="/manage">Manage Labs</a>{% endif %}
         </div>
     </div>
     <form method="get" class="reveal" id="add-instructor" data-reveal>
           <p class="lead">Add course instructor:</p>
-            {% include 'administration/search_instructors.html' %}
+            {% include 'administration/search_users.html' %}
           <button class="close-button" data-close aria-label="Close modal" type="button">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -29,9 +29,11 @@
                         </th>
                     </tr>
                     <tbody>
-                        {% for student in students %}
-                            <tr><td>{{ student.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove={{ student.id }}">Remove</a>{% endif %}</td></tr>
-                        {% endfor %}
+                        {% if course.students %}
+                          {% for student in course.students %}
+                              <tr><td>{{ student.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove={{ student.id }}">Remove</a>{% endif %}</td></tr>
+                          {% endfor %}
+                        {% endif %}
                     </tbody>
                 </thead>
         </table>
@@ -44,16 +46,32 @@
                         </th>
                     </tr>
                     <tbody>
-                        {% for instructor in instructors %}
+                      {% if course.instructors %}
+                        {% for instructor in course.instructors %}
                             <tr><td>{{ instructor.name }} {% if has_perms %}<a style="float: right; color: red" href="/course/{{ course.id }}?remove_instructor={{ instructor.id }}">Remove</a>{% endif %}</td></tr>
                         {% endfor %}
+                      {% endif %}
                     </tbody>
                 </thead>
         </table>
     </div>
     <hr style="margin-top: 200px;">
-    <div style="width: 50%; margin: auto">
-        <h3>Course Leaderboard</h3>
-        {% include 'leaderboard.html' %}
+    <div class="row">
+        <div class="small-6 columns">
+            <h3>Course Leaderboard</h3>
+            {% include 'leaderboard.html' %}
+        </div>
+        <div class="small-6 large-4 columns" style="text-align: end">
+            <h3>Course Labs</h3>
+            <table class="list unstriped hover" style="table-layout: fixed;">
+                <tbody>
+                    {% if course.labs %}
+                        {% for lab in course.labs %}
+                            <tr><td><h5 style="margin-bottom: 0;">- / {{ lab.total_points }}pts</h5></td><td style="width: 200px"><a href="/lab/{{ lab.id }}">{{ lab.name }}</a></td></tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}

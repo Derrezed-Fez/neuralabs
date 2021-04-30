@@ -1,0 +1,42 @@
+<div class="reveal" id="create-course" data-reveal>
+    <form action="/create_course" method="post">
+        <p class="lead">Course Name:</p>
+        {{ tag_form.name }}
+        <button class="button small" type="submit">Create Course</button>
+        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+        {{ tag_form.hidden_tag() }}
+    </form>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>
+                All Courses
+            </th>
+            <th>
+                <a data-open="create-course" style="float: right;"><i class="fi-plus"></i> Create New Course</a>
+            </th>
+        </tr>
+        <tbody>
+        {% if courses %}
+          {% for course in courses %}
+              <tr>
+                  <td><a href="/course/{{ course.id }}">{{ course.name }}</a></td>
+                  <td>
+                      <span style="color: gray;">{{ course.students|length }} students</span>
+                      <a style="float: right; color: red" data-open="confirm-delete-{{ course.id }}">Delete</a>
+                      <div class="reveal" id="confirm-delete-{{ course.id }}" data-reveal>
+                        <p class="lead">Are you sure you want to delete:</p>
+                        <p>{{ course.name }} ({{ course.students|length }} students)</p>
+                        <a href="/delete_course/{{ course.id }}" class="button small">Delete</a>
+                        <button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                  </td>
+              </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td>There are no created courses.</tr>
+        {% endif %}
+        </tbody>
+    </thead>
+</table>
